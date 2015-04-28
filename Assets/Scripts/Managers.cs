@@ -80,6 +80,7 @@ public class Managers : MonoBehaviour
         m_inputHandler = gameObject.AddComponent<InputHandler>();
         m_uiManager = gameObject.AddComponent<UIManager>();
         m_playerManager = gameObject.AddComponent <PlayerManager>();
+        m_playerManager.Init();
 
     }
     #endregion

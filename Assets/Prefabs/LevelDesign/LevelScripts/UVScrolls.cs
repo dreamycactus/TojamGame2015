@@ -16,7 +16,7 @@ public class UVScrolls : MonoBehaviour {
 
         offset.x = transform.position.x / transform.localScale.x / parralax;
 
-        offset.y = transform.position.y / transform.localScale.y / (10*parralax) ;
+        offset.y = transform.position.y / transform.localScale.y / (10*parralax)+0.91f ;
 
         mat.mainTextureOffset = offset;
 

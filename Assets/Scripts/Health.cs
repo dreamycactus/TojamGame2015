@@ -4,8 +4,20 @@ using System.Collections;
 public class Health : MonoBehaviour
 {
 
-    private int m_maxHealth;
+    public int m_maxHealth = 100;
     private int m_currentHealth;
+
+    // Use this for initialization
+    void Start()
+    {
+        m_currentHealth = m_maxHealth;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 
     public int currentHealth
     {

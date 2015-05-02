@@ -17,4 +17,10 @@ public class Enums : MonoBehaviour {
         GS_05_LEAVING = 5 // POST GAME CLEAN UP
     };
 
+    public enum EnemyApproachDirection
+    {
+        Left = 0,
+        Right = 1
+    }
+
 }

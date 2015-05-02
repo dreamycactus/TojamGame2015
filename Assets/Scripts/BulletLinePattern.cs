@@ -10,7 +10,7 @@ class BulletLinePattern : BulletPattern {
 	private float m_cooldown;
 	public float Speed;
 	public float AngleOffset = 0.0f;
-	public BulletLinePattern(float period, float speed) {
+	public BulletLinePattern(BulletEmitter em, float period, float speed) {
 		Period = period;
 		Speed = speed;
 	}

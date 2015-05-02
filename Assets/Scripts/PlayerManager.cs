@@ -42,7 +42,7 @@ public class PlayerManager : MonoBehaviour {
     #region Unity Defaults
     void Awake()
     {
-        m_playerCameras = new GameObject[2];
+        m_playerCameras = new GameObject[1];
         m_playerCharacters = new GameObject[2];
         m_playerControllers = new PlayerController[2];
     }
@@ -75,9 +75,9 @@ public class PlayerManager : MonoBehaviour {
     //spawn cameras + initialization
     private void SpawnCameras()
     {
-        GameObject Cameraroot = GameObject.Instantiate(Managers.GetInstance().GetGameProperties().Cameras_prefab);
+        GameObject Cameraroot = GameObject.Instantiate(Managers.GetInstance().GetGameProperties().Cameras1_prefab);
         m_playerCameras[0] = Cameraroot.transform.GetChild(0).gameObject;
-        m_playerCameras[1] = Cameraroot.transform.GetChild(1).gameObject;
+        //m_playerCameras[1] = Cameraroot.transform.GetChild(1).gameObject;
     }
 
     //spawn playerSprites + initialization
@@ -85,7 +85,8 @@ public class PlayerManager : MonoBehaviour {
     {
         m_playerCharacters[0] = GameObject.Instantiate(Managers.GetInstance().GetGameProperties().Player1_prefab);
         m_playerCharacters[0].GetComponent<PlayerController>().PlayerCamera = m_playerCameras[0];
+		m_playerCharacters[0].transform.position = new Vector3(0, 0, 0);
 
-    }
+	}
     #endregion
 }

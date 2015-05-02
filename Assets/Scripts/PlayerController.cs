@@ -92,6 +92,11 @@ public class PlayerController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
     {
+        // Multiply the player's x local scale by -1
+        Vector3 l_facing = transform.localScale;
+        l_facing.x = m_Direction;
+        transform.localScale = l_facing;
+
 
         //keep up with camera
         m_camOffset.x = transform.position.x;
@@ -112,12 +117,6 @@ public class PlayerController : MonoBehaviour {
     // FixedUpdate is called on a timer
     void FixedUpdate()
     {
-        //get if grounded
-        //RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, m_size, 9);
-        //if (hit.collider != null)
-        //    m_grounded = true;
-        //else
-        //    m_grounded = false;
 
 
         // State machine shenanigans 
@@ -491,6 +490,7 @@ public class ShootState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
+        
 
     }
 

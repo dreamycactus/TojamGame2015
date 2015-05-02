@@ -9,7 +9,21 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour {
 
 	#region Public Variables
-    public float m_ForceMultiplier = 5.0f;
+    public float m_movementMultiplier = 5.0f;
+    public float m_maxSpeed = 5.0f;
+    public Rigidbody2D m_rb;
+
+
+    //input placeholder bools
+    public bool m_upKey = false;
+    public bool m_downKey = false;
+    public bool m_rightKey = false;
+    public bool m_leftKey = false;
+    public bool m_chompKey = false;
+    public bool m_jumpKey = false;
+    public bool m_shootKey = false;
+    public bool m_blockKey = false;
+
     #endregion
 
     #region Protected Variables
@@ -20,7 +34,10 @@ public class PlayerController : MonoBehaviour {
     public enum CharacterStateNames
     {
         NullState = 0,
-        IdleState = 0,
+        IdleState,
+        WalkState,
+        JumpState,
+        CrouchState
 
     }
     private Dictionary<CharacterStateNames, PlayerBase> m_gameStateDictionary = new Dictionary<CharacterStateNames, PlayerBase>();
@@ -31,20 +48,9 @@ public class PlayerController : MonoBehaviour {
 
     //oer private vars
     private GameObject m_Camera;
-    private Rigidbody2D m_rb;
 
     private Vector3 m_camOffset;
     private float m_camDepth = -10;
-    
-    //input placeholder bools
-    private bool m_upKey = false;
-    private bool m_downKey = false;
-    private bool m_rightKey = false;
-    private bool m_leftKey  = false;
-    private bool m_chompKey = false;
-    private bool m_jumpKey = false;
-    private bool m_shootKey = false;
-    private bool m_blockKey = false;
 
     #endregion
 
@@ -63,17 +69,18 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
     {
-        m_camOffset = new Vector3(0, 3.5f, m_camDepth); 
+        m_camOffset = new Vector3(0, 3.5f, m_camDepth);
+        m_rb.fixedAngle = true;
+        Init();
 
 	}
 	// Update is called once per frame
 	void Update () 
     {
         //get if grounded
-        Vector3 fwd = transform.TransformDirection(Vector3.forward);
-        if (Physics.Raycast(transform.position, fwd, 10))
-            print("There is something in front of the object!");
-        
+        Vector3 fwd = transform.TransformDirection(Vector3.down);
+        if (Physics.Raycast(transform.position, fwd, 1, 9))
+            Debug.Log("Touching");
 
         //GetInputs really shitty
         if (Input.GetKeyDown(KeyCode.RightArrow))
@@ -82,22 +89,24 @@ public class PlayerController : MonoBehaviour {
             m_rightKey = false;
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
-            m_rightKey = true;
+            m_leftKey = true;
         if (Input.GetKeyUp(KeyCode.LeftArrow))
-            m_rightKey = false;
+            m_leftKey = false;
 
         if (Input.GetKeyDown(KeyCode.UpArrow))
-            m_rightKey = true;
+            m_upKey = true;
         if (Input.GetKeyUp(KeyCode.UpArrow))
-            m_rightKey = false;
+            m_upKey = false;
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
-            m_rightKey = true;
+            m_downKey = true;
         if (Input.GetKeyUp(KeyCode.DownArrow))
-            m_rightKey = false;
+            m_downKey = false;
 
-
-
+        if (Input.GetKeyDown(KeyCode.Space))
+            m_jumpKey = true;
+        if (Input.GetKeyUp(KeyCode.Space))
+            m_jumpKey = false;
 
         //keep up with camera
         m_Camera.transform.position = transform.position + m_camOffset;
@@ -106,8 +115,6 @@ public class PlayerController : MonoBehaviour {
     // FixedUpdate is called on a timer
     void FixedUpdate()
     {
-        //this is placeholder code
-
         // State machine shenanigans 
         if (!m_initialised)
             return;
@@ -125,17 +132,6 @@ public class PlayerController : MonoBehaviour {
             m_nextGameStateIndex = CharacterStateNames.NullState;
         }
 
-
-        if (Input.GetKey(KeyCode.RightArrow))
-        {
-            m_rb.AddForce(Vector2.right * m_ForceMultiplier);
-        }
-        if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            m_rb.AddForce(-Vector2.right * m_ForceMultiplier);
-        }
-        //bugs
-
     }
 
     #endregion
@@ -146,7 +142,10 @@ public class PlayerController : MonoBehaviour {
     {
         // Initialise the bookstateDictionary
         m_gameStateDictionary.Add(CharacterStateNames.IdleState, new IdlePlayer(this));
-
+        m_gameStateDictionary.Add(CharacterStateNames.WalkState, new WalkState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.JumpState, new JumpState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.CrouchState, new CrouchState(this));
+        
         //start the state machine
         ChangeGameState(CharacterStateNames.IdleState); //starts in the idle
 
@@ -215,12 +214,22 @@ public class IdlePlayer : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-       
+        Debug.Log("In Idle State");
     }
 
     public override void UpdateState()
     {
-        
+        if (m_cont.m_rightKey || m_cont.m_leftKey) //moving left or right
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.WalkState);
+        if (m_cont.m_jumpKey)
+        {
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.JumpState);
+        }
+        if (m_cont.m_downKey)
+        {
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.CrouchState);
+        }
+
 
     }
 
@@ -240,12 +249,106 @@ public class WalkState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
+        Debug.Log("In Walking State");
+    }
 
+    public override void UpdateState()
+    {
+        //CHECK IF GROUNDED
+
+
+        //input
+        if(m_cont.m_rightKey)
+        {
+            m_cont.m_rb.velocity = new Vector2(m_cont.m_movementMultiplier, m_cont.m_rb.velocity.y);
+        }
+        if (m_cont.m_leftKey)
+        {
+            m_cont.m_rb.velocity = new Vector2(-1.0f*m_cont.m_movementMultiplier, m_cont.m_rb.velocity.y);
+        }
+        if (m_cont.m_jumpKey)
+        {
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.JumpState);
+        }
+        if (m_cont.m_downKey)
+        {
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.CrouchState);
+        }
+
+        //Clamp speed
+        if (Mathf.Abs(m_cont.m_rb.velocity.x) > m_cont.m_maxSpeed)
+        {
+            float spd = m_cont.m_rb.velocity.x;
+            spd = Mathf.Clamp(spd, -m_cont.m_maxSpeed, m_cont.m_maxSpeed);
+            m_cont.m_rb.velocity = new Vector2(spd, m_cont.m_rb.velocity.y);
+        }
+
+        //standing still
+        if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
+        {
+            m_cont.m_rb.velocity = new Vector2(0, m_cont.m_rb.velocity.y);
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.IdleState);
+        }
+            
+    }
+
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
+
+    }
+}
+
+//jumping state
+public class JumpState : PlayerBase
+{
+    public JumpState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        Debug.Log("In Jumping State");
     }
 
     public override void UpdateState()
     {
 
+
+        if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
+        {
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.IdleState);
+        }
+    }
+
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
+
+    }
+}
+
+//Crouching state
+public class CrouchState : PlayerBase
+{
+    public CrouchState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        Debug.Log("In Crouching State");
+    }
+
+    public override void UpdateState()
+    {
+
+
+
+        if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
+        {
+            m_cont.ChangeGameState(PlayerController.CharacterStateNames.IdleState);
+        }
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)

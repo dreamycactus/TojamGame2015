@@ -20,6 +20,7 @@ class Griffin : MonoBehaviour {
 	public float sinKX = 0.05f;
 	public float elapsedTime;
 	public float speed = 0.1f;
+	private BulletEmitter bEmitter;
 
 	void Start() {
 		body = this.gameObject.GetComponent<Rigidbody2D>();
@@ -36,6 +37,7 @@ class Griffin : MonoBehaviour {
 		}
 		targetPlayer = players[playerIndex];
 		idealHeight = transform.position.y;
+		bEmitter = gameObject.GetComponent<BulletEmitter>();
 	}
 
 	void Update() {
@@ -44,7 +46,10 @@ class Griffin : MonoBehaviour {
 				if ((targetPlayer.transform.position - transform.position).magnitude < Constants.ENEMY_DETECTION_RADIUS) {
 					state = GriffinState.Approach;
 					body.velocity = new Vector2(speed, 0);
+					bEmitter.ToggleAutoFire();
 					//TODO Play griffin sound
+					bEmitter.Target = new Vector2(speed * 1000000, transform.position.y);
+
 				}
 				break;
 			case GriffinState.Approach:
@@ -56,7 +61,6 @@ class Griffin : MonoBehaviour {
 			case GriffinState.Shoot:
 				break;
 			case GriffinState.Death:
-
 				break;
 		}
 	}

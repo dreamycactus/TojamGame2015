@@ -12,5 +12,6 @@ public class Constants : MonoBehaviour {
 	//public const MOVESPEED = 2.0f;
 	public static float NORMAL_BULLET_SPEED = 10.0f; 
 	public static float NORMAL_BULLET_PERIOD = 1.0f;
+	public static float NORMAL_BULLET_SMALL_PERIOD = 0.1f;
 	public static float ENEMY_DETECTION_RADIUS = 20;
 }

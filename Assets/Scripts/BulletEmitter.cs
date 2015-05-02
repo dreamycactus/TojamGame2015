@@ -16,6 +16,7 @@ public class BulletEmitter : MonoBehaviour
 {
 	List<BulletPattern> bPatterns;
 	public List<String> Patterns;
+    public bool m_autoFire = false;
 
 	public Vector2 Target;
 	public BulletEmitter ()
@@ -44,9 +45,18 @@ public class BulletEmitter : MonoBehaviour
 	}
 
 	public void Update() {
-		foreach(var p in bPatterns) {
-			p.Step(this.gameObject.transform.position.GetVector2(), Target);
-		}
+		if (m_autoFire)
+        {
+            foreach (var p in bPatterns)
+            {
+                p.Step(this.gameObject.transform.position.GetVector2(), Target);
+            }
+        }
 	}
+
+    public void ToggleAutoFire()
+    {
+        m_autoFire = !m_autoFire;
+    }
 }
 

@@ -13,22 +13,38 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
 	public float m_currentLife;
-	public int m_dmg;
+	public int m_dmg = 1;
 	public Bullet ()
 	{
 	}
 		
 	public void Free() {
-		if (this.gameObject != null) {
+        m_currentLife = 0;
+        
+        if (this.gameObject != null) {
 			BulletManager.Inst.FreeBullet(this.gameObject);
 		}
 	}
 
 	public void Update() {
-		m_currentLife -= Time.deltaTime;
-		if (m_currentLife < 0) {
-			Free();
-		}
+		if (m_currentLife > 0)
+        {
+            m_currentLife -= Time.deltaTime;
+		    if (m_currentLife < 0) {
+			    Free();
+		    }
+        }
 	}
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Player")
+        {
+            //other.GetComponent<Health>().TakeDamage(m_dmg);
+            Free();
+            Debug.Log("Player Hit");
+        }
+
+    }
 }
 

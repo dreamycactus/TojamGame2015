@@ -23,17 +23,20 @@ public class SoldierController : MonoBehaviour {
     private GameObject m_playerOne;
     private GameObject m_playerTwo;
 
+    private GameObject m_target;
+
     public float m_approachDist = 10.0f;
     public float m_shootDist = 5.0f;
 
-    private float m_shootTimer = 0;
-    public float m_shootRepeatTime = 1f;
+    private BulletEmitter m_bulletEmitter;
 
 	// Use this for initialization
 	void Start () {
         m_currentState = SoldierState.Idle;
 
         m_rb = gameObject.GetComponent<Rigidbody2D>();
+
+        m_bulletEmitter = gameObject.GetComponent<BulletEmitter>();
 
         m_playerOne = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
         //m_playerTwo = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();
@@ -51,6 +54,8 @@ public class SoldierController : MonoBehaviour {
 
                 if (Mathf.Abs(transform.position.x - m_playerOne.transform.position.x) < m_approachDist)
                 {
+                    m_target = m_playerOne;
+                    
                     if (transform.position.x - m_playerOne.transform.position.x < 0)
                     {
                         m_direction = Enums.EnemyApproachDirection.Right;
@@ -85,7 +90,7 @@ public class SoldierController : MonoBehaviour {
                 ApplyMovement(false);
 
                 //Checks distance and enters next state if close
-                if ((Mathf.Abs(transform.position.x - m_playerOne.transform.position.x) < m_shootDist) /*|| (Mathf.Abs(transform.position.x - m_playerTwo.transform.position.x) < m_shootDist)*/)
+                if ((Mathf.Abs(transform.position.x - m_target.transform.position.x) < m_shootDist))
                 {
                     if (m_direction == Enums.EnemyApproachDirection.Left)
                         m_direction = Enums.EnemyApproachDirection.Right;
@@ -93,26 +98,17 @@ public class SoldierController : MonoBehaviour {
                         m_direction = Enums.EnemyApproachDirection.Left;
 
                     //m_rb.velocity = new Vector2(0.0f, 0.0f);    //Stops soldier in place to shoot
-                    m_shootTimer = 0.1f;
                     m_currentState = SoldierState.Shoot;    //Switch to shooting state
+
+                    m_bulletEmitter.ToggleAutoFire();
                 }
                 break;
 
             case SoldierState.Shoot:
 
-                ApplyMovement(true);
-                
-                if (m_shootTimer > 0)
-                {
-                    m_shootTimer -= Time.deltaTime;
+                m_bulletEmitter.Target = m_target.transform.position;
 
-                    if (m_shootTimer <= 0)
-                    {
-                        //Shoot from Emitter
-                        Debug.Log("Soldier is shoot");
-                        m_shootTimer = m_shootRepeatTime;
-                    }
-                }
+                ApplyMovement(true);
 
                 break;
 

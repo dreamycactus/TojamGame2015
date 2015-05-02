@@ -20,7 +20,7 @@ class BulletLinePattern : BulletPattern {
 			m_cooldown = Period;
 			GameObject bullet = BulletManager.Inst.GetBullet();
 			bullet.transform.position = new Vector3(spawn.x, spawn.y, 0.0f);
-			bullet.GetComponent<Rigidbody2D>().velocity = Vector2.MoveTowards(spawn, target, Speed).Rotated(AngleOffset);
+            bullet.GetComponent<Rigidbody2D>().velocity = (Vector2)Vector3.Normalize(target - spawn) * Speed;
 			bullet.GetComponent<Bullet>().m_currentLife = 5.0f;
 		}
 	}

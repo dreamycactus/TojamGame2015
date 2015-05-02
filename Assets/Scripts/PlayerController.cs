@@ -9,10 +9,19 @@ using System.Collections.Generic;
 public class PlayerController : MonoBehaviour {
 
 	#region Public Variables
+   
+
     public float m_movementMultiplier = 5.0f;
     public float m_maxSpeed = 5.0f;
     public float m_jumpSpeed = 15.0f;
     public float m_jumpDuration = 0.3f;
+    public float m_chomSpeed = 10.0f;
+    public float m_chompDuration = 0.1f;
+    public float m_shootDuration = 0.2f;
+    public float m_stompPauseDuration = 0.1f;
+    public float m_stompSpeed = 25.0f;
+
+    public int m_Direction = 1;
     public Rigidbody2D m_rb;
 
 
@@ -40,8 +49,10 @@ public class PlayerController : MonoBehaviour {
         IdleState,
         WalkState,
         JumpState,
-        CrouchState
-
+        CrouchState,
+        ChompState,
+        ShootState,
+        StompState
     }
     private Dictionary<CharacterStateNames, PlayerBase> m_gameStateDictionary = new Dictionary<CharacterStateNames, PlayerBase>();
     private PlayerBase m_currentGameState = null;
@@ -84,12 +95,19 @@ public class PlayerController : MonoBehaviour {
 
         //GetInputs really shitty
         if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            m_Direction = 1;
             m_rightKey = true;
+        }
         if (Input.GetKeyUp(KeyCode.RightArrow))
             m_rightKey = false;
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            m_Direction = -1;
             m_leftKey = true;
+        }
+           
         if (Input.GetKeyUp(KeyCode.LeftArrow))
             m_leftKey = false;
 
@@ -107,6 +125,17 @@ public class PlayerController : MonoBehaviour {
             m_jumpKey = true;
         if (Input.GetKeyUp(KeyCode.Space))
             m_jumpKey = false;
+
+        if (Input.GetKeyDown(KeyCode.Z))
+            m_chompKey = true;
+        if (Input.GetKeyUp(KeyCode.Z))
+            m_chompKey = false;
+
+        if (Input.GetKeyDown(KeyCode.X))
+            m_shootKey = true;
+        if (Input.GetKeyUp(KeyCode.X))
+            m_shootKey = false;
+
 
         //keep up with camera
         m_camOffset.x = transform.position.x;
@@ -166,9 +195,12 @@ public class PlayerController : MonoBehaviour {
         m_gameStateDictionary.Add(CharacterStateNames.WalkState, new WalkState(this));
         m_gameStateDictionary.Add(CharacterStateNames.JumpState, new JumpState(this));
         m_gameStateDictionary.Add(CharacterStateNames.CrouchState, new CrouchState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.ChompState, new ChompState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.ShootState, new ShootState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.StompState, new StompState(this));
         
         //start the state machine
-        ChangeGameState(CharacterStateNames.IdleState); //starts in the idle
+        ChangePlayerState(CharacterStateNames.IdleState); //starts in the idle
 
 
         m_initialised = true;
@@ -176,7 +208,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     //Change the game state (occurs on next frame)
-    public void ChangeGameState(CharacterStateNames nextState)
+    public void ChangePlayerState(CharacterStateNames nextState)
     {
         if (!m_gameStateDictionary.ContainsKey(nextState))
             return;
@@ -241,17 +273,23 @@ public class IdlePlayer : PlayerBase
     public override void UpdateState()
     {
         if (m_cont.m_rightKey || m_cont.m_leftKey) //moving left or right
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.WalkState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.WalkState);
         if (m_cont.m_jumpKey)
         {
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.JumpState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.JumpState);
         }
         if (m_cont.m_downKey)
         {
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.CrouchState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.CrouchState);
         }
-
-
+        if (m_cont.m_shootKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
+        }
+        if (m_cont.m_chompKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
+        }
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
@@ -287,11 +325,19 @@ public class WalkState : PlayerBase
         }
         if (m_cont.m_jumpKey)
         {
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.JumpState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.JumpState);
         }
         if (m_cont.m_downKey)
         {
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.CrouchState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.CrouchState);
+        }
+        if (m_cont.m_shootKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
+        }
+        if (m_cont.m_chompKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
         }
 
         //Clamp speed
@@ -306,7 +352,7 @@ public class WalkState : PlayerBase
         if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
         {
             m_cont.m_rb.velocity = new Vector2(0, m_cont.m_rb.velocity.y);
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.IdleState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
         }
             
     }
@@ -329,7 +375,12 @@ public class JumpState : PlayerBase
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         Debug.Log("In Jumping State");
-        m_jumpTime = m_cont.m_jumpDuration;
+        if (p_prevState != PlayerController.CharacterStateNames.ShootState)
+            m_jumpTime = m_cont.m_jumpDuration;
+        else
+            m_jumpTime = 0;
+        
+            
     }
 
     public override void UpdateState()
@@ -342,11 +393,19 @@ public class JumpState : PlayerBase
             temp.y = m_cont.m_jumpSpeed;
             m_cont.m_rb.velocity = temp;
         }
-        
-        
+        if (m_cont.m_shootKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
+        }
+        if (m_cont.m_chompKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.StompState);
+        }
+
+
         if(m_cont.m_grounded && m_jumpTime < 0)
         {
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.IdleState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
         }
         
     }
@@ -378,10 +437,20 @@ public class CrouchState : PlayerBase
 
     public override void UpdateState()
     {
-
-        if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
+        if (m_cont.m_chompKey)
         {
-            m_cont.ChangeGameState(PlayerController.CharacterStateNames.IdleState);
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
+        }
+        if (m_cont.m_shootKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
+        }
+        
+
+
+        if (!m_cont.m_downKey)
+        {
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
         }
     }
 
@@ -389,5 +458,125 @@ public class CrouchState : PlayerBase
     {
         m_scale.y *= 2.0f;
         m_cont.transform.localScale = m_scale;
+    }
+}
+
+//while chomping around state
+public class ChompState : PlayerBase
+{
+    private float m_chompTime;
+    private PlayerController.CharacterStateNames m_lastState;
+    public ChompState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        m_chompTime = m_cont.m_chompDuration;
+        m_lastState = p_prevState;
+        Debug.Log("Chomp");
+    }
+
+    public override void UpdateState()
+    {
+        m_chompTime -= Time.fixedDeltaTime;
+        if (m_chompTime > 0)
+        {
+            Vector2 temp = m_cont.m_rb.velocity;
+            temp.x = m_cont.m_chomSpeed*m_cont.m_Direction;
+            m_cont.m_rb.velocity = temp;
+        }
+        
+        if(m_chompTime <= 0)
+        {
+            m_cont.m_rb.velocity = Vector2.zero;
+            m_cont.ChangePlayerState(m_lastState);
+        }
+
+    }
+
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
+
+    }
+}
+
+//while on the ground shooting
+public class ShootState : PlayerBase
+{
+    private float m_ShootTime;
+    private PlayerController.CharacterStateNames m_laststate;
+    public ShootState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        Debug.Log("Shooting a fireball");
+        m_ShootTime = m_cont.m_shootDuration;
+        m_laststate = p_prevState;
+    }
+
+    public override void UpdateState()
+    {
+        m_ShootTime -= Time.fixedDeltaTime;
+        if (m_ShootTime > 0)
+        {
+            //SHOOTING DIRECTIONAL CODE GOES HERE
+        }
+        // NO MOVEMENT;
+        m_cont.m_rb.velocity = Vector2.zero;
+        if (m_ShootTime <= 0)
+            m_cont.ChangePlayerState(m_laststate);
+
+    }
+
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
+
+    }
+
+}
+
+public class StompState : PlayerBase
+{
+    private float m_stompTime;
+    private bool flag;
+
+    public StompState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+    
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        m_stompTime = m_cont.m_stompPauseDuration;
+        flag = false;
+        Debug.Log("Stomping");
+    }
+
+    public override void UpdateState()
+    {
+        m_stompTime -= Time.fixedDeltaTime;
+        if (m_stompTime > 0)
+        {
+            m_cont.m_rb.velocity = Vector2.zero;
+        }
+        if (m_stompTime < 0 && !flag)
+        {
+            m_cont.m_rb.velocity = new Vector2(0, m_cont.m_stompSpeed);
+            flag = true;
+        }
+
+
+        if (m_cont.m_grounded) //when hits the ground
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
+    }
+
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
+
     }
 }

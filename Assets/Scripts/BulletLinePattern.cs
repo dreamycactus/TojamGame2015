@@ -8,7 +8,7 @@ using UnityEngine;
 class BulletLinePattern : BulletPattern {
 	public float Period;
 	private float m_cooldown;
-	private float smallCooldown = 0.1f;
+	private float smallCooldown;
 	public int burstCount;
 	private int burstIndex = 0;
 	public float Speed;

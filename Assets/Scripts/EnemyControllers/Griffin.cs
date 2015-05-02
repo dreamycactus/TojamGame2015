@@ -61,7 +61,12 @@ class Griffin : MonoBehaviour {
 			case GriffinState.Shoot:
 				break;
 			case GriffinState.Death:
+				GameObject exp = Instantiate(Resources.Load("Explosion")) as GameObject;
+				exp.transform.position = transform.position;
 				break;
 		}
+	}
+	void OnCollisionEnter(Collision col) {
+		state = GriffinState.Death;
 	}
 }

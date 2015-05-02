@@ -84,12 +84,12 @@ public class PlayerManager : MonoBehaviour {
     private void SpawnPlayers()
     {
         m_playerCharacters[0] = GameObject.Instantiate(Managers.GetInstance().GetGameProperties().Player1_prefab);
-		m_playerCharacters[0].transform.position = new Vector2(-10, 0);
+		m_playerCharacters[0].transform.position = new Vector2(-20, 0);
         m_playerCharacters[0].GetComponent<PlayerController>().PlayerCamera = m_playerCameras[0];
         m_playerControllers[0] = m_playerCharacters[0].GetComponent<PlayerController>();
 
         m_playerCharacters[1] = GameObject.Instantiate(Managers.GetInstance().GetGameProperties().Player1_prefab);
-		m_playerCharacters[1].transform.position = new Vector2(10, 0);
+		m_playerCharacters[1].transform.position = new Vector2(20, 0);
         m_playerCharacters[1].GetComponent<PlayerController>().PlayerCamera = m_playerCameras[1];
         m_playerControllers[1] = m_playerCharacters[1].GetComponent<PlayerController>();
         m_playerControllers[1].PlayerCamera = m_playerCameras[1];

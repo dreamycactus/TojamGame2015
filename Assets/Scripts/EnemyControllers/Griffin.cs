@@ -29,6 +29,8 @@ class Griffin : MonoBehaviour {
 		players[0] = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
 		players[1] = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();
 
+		Physics2D.IgnoreCollision(players[0].GetComponent<Collider2D>(), GetComponent<Collider2D>());
+		Physics2D.IgnoreCollision(players[1].GetComponent<Collider2D>(), GetComponent<Collider2D>());
 
 		if (Mathf.Abs(transform.position.x - players[0].transform.position.x) < Mathf.Abs(transform.position.x - players[1].transform.position.x))
 		{
@@ -77,7 +79,13 @@ class Griffin : MonoBehaviour {
 				break;
 		}
 	}
-	void OnCollisionEnter2D(Collision2D col) {
+
+	private void EnterDeathState()
+	{
 		state = GriffinState.Death;
+	}
+
+	void OnCollisionEnter2D(Collision2D col) {
+		
 	}
 }

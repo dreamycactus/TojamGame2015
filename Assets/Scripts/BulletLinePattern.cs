@@ -8,7 +8,7 @@ using UnityEngine;
 class BulletLinePattern : BulletPattern {
 	public float Period;
 	private float m_cooldown;
-	private float smallCooldown;
+	private float smallCooldown = Constants.NORMAL_BULLET_SMALL_PERIOD;
 	public int burstCount;
 	private int burstIndex = 0;
 	public float Speed;
@@ -23,7 +23,7 @@ class BulletLinePattern : BulletPattern {
 		if (burstIndex >= burstCount) {
 			m_cooldown -= Time.deltaTime;
 		} else {
-			if (smallCooldown < 0.0f) {
+			if (smallCooldown <= 0.0f) {
 				smallCooldown = Constants.NORMAL_BULLET_SMALL_PERIOD;
 				burstIndex++;
 				GameObject bullet = BulletManager.Inst.GetBullet();
@@ -33,7 +33,7 @@ class BulletLinePattern : BulletPattern {
 			}
 			smallCooldown -= Time.deltaTime;
 		}
-		if (m_cooldown < 0) {
+		if (m_cooldown <= 0) {
 			m_cooldown = Period;
 			burstIndex = 0;
 		}

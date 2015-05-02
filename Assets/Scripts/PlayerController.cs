@@ -36,6 +36,9 @@ public class PlayerController : MonoBehaviour {
     public bool m_blockKey = false;
 
     public bool m_grounded = false;
+
+    public Animator m_animator;
+
     #endregion
 
     #region Protected Variables
@@ -46,17 +49,17 @@ public class PlayerController : MonoBehaviour {
     public enum CharacterStateNames
     {
         NullState = 0,
-        IdleState,
-        WalkState,
-        JumpState,
-        CrouchState,
-        ChompState,
-        ShootState,
-        StompState
+        IdleState = 1,
+        WalkState = 2,
+        JumpState = 3,
+        CrouchState = 4,
+        ChompState = 5,
+        ShootState = 6,
+        StompState = 7
     }
     private Dictionary<CharacterStateNames, PlayerBase> m_gameStateDictionary = new Dictionary<CharacterStateNames, PlayerBase>();
     private PlayerBase m_currentGameState = null;
-    private CharacterStateNames m_currentGameStateIndex = CharacterStateNames.NullState;
+    public CharacterStateNames m_currentGameStateIndex = CharacterStateNames.NullState;
     private CharacterStateNames m_nextGameStateIndex = CharacterStateNames.NullState;
     private bool m_initialised = false;
 
@@ -86,6 +89,7 @@ public class PlayerController : MonoBehaviour {
         m_camOffset = new Vector3(0, 1.5f, m_camDepth);
         m_rb.fixedAngle = true;
         m_size = 0.55f;
+        m_animator = gameObject.GetComponent<Animator>();
         Init();
 
 	}
@@ -97,6 +101,7 @@ public class PlayerController : MonoBehaviour {
         l_facing.x = m_Direction;
         transform.localScale = l_facing;
 
+        
 
         //keep up with camera
         m_camOffset.x = transform.position.x;
@@ -117,7 +122,6 @@ public class PlayerController : MonoBehaviour {
     // FixedUpdate is called on a timer
     void FixedUpdate()
     {
-
 
         // State machine shenanigans 
         if (!m_initialised)
@@ -168,6 +172,7 @@ public class PlayerController : MonoBehaviour {
         if (!m_gameStateDictionary.ContainsKey(nextState))
             return;
 
+        m_animator.SetInteger(HashIDs.State, (int)nextState);
         m_nextGameStateIndex = nextState;
     }
 
@@ -226,6 +231,8 @@ public class IdlePlayer : PlayerBase
 
     public override void UpdateState()
     {
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
+
         if (m_cont.m_rightKey || m_cont.m_leftKey) //moving left or right
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.WalkState);
         if (m_cont.m_jumpKey)
@@ -266,7 +273,7 @@ public class WalkState : PlayerBase
 
     public override void UpdateState()
     {
-
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         //input
         if(m_cont.m_rightKey)
         {
@@ -337,6 +344,7 @@ public class JumpState : PlayerBase
 
     public override void UpdateState()
     {
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_jumpTime -= Time.fixedDeltaTime;
 
         if(m_jumpTime > 0)
@@ -389,6 +397,7 @@ public class CrouchState : PlayerBase
 
     public override void UpdateState()
     {
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         if (m_cont.m_chompKey)
         {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
@@ -432,6 +441,7 @@ public class ChompState : PlayerBase
 
     public override void UpdateState()
     {
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_chompTime -= Time.fixedDeltaTime;
         if (m_chompTime > 0)
         {
@@ -473,6 +483,7 @@ public class ShootState : PlayerBase
 
     public override void UpdateState()
     {
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_ShootTime -= Time.fixedDeltaTime;
         if (m_ShootTime > 0)
         {
@@ -512,6 +523,7 @@ public class StompState : PlayerBase
 
     public override void UpdateState()
     {
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_stompTime -= Time.fixedDeltaTime;
         if (m_stompTime > 0)
         {

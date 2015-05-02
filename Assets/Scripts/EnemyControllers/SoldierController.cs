@@ -142,7 +142,9 @@ public class SoldierController : MonoBehaviour {
                 break;
 
             case SoldierState.Death:
-
+				GameObject exp = Instantiate(Resources.Load("Explosion")) as GameObject;
+				exp.transform.position = transform.position;
+				Destroy(this.gameObject);
                 break;
         }
         
@@ -152,7 +154,7 @@ public class SoldierController : MonoBehaviour {
     {
         Debug.Log("Soldier is kill");
 
-
+		m_currentState = SoldierState.Death;
     }
 
     private void ApplyMovement(bool p_isStrafing)

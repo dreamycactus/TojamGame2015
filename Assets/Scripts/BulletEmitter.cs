@@ -29,14 +29,21 @@ public class BulletEmitter : MonoBehaviour
 
 	public void Refresh() {
 		bPatterns = new List<BulletPattern>();
-		Debug.Log("hello" + Patterns.Count);
 		foreach (var p in Patterns) {
-			switch(p) {
+			var args = p.Split(':');
+			switch (args[0]) {
 				case "line":
-					bPatterns.Add(new BulletLinePattern(Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED));
+					int count = 1;
+					float angle = 0;
+					if (args.Length > 1) {
+						count = Convert.ToInt32(args[1]);
+					}
+					if (args.Length > 2) {
+						angle = float.Parse(args[2]);
+					}
+					bPatterns.Add(new BulletLinePattern(this, count, angle, Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED));
 					break;
 				case "sine":
-					bPatterns.Add(new BulletLinePattern(Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED));
 					break;
 				default:
 					break;

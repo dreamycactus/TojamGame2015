@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour {
 	#region Public Variables
     public float m_movementMultiplier = 5.0f;
     public float m_maxSpeed = 5.0f;
+    public float m_jumpSpeed = 15.0f;
+    public float m_jumpDuration = 0.3f;
     public Rigidbody2D m_rb;
 
 
@@ -24,6 +26,7 @@ public class PlayerController : MonoBehaviour {
     public bool m_shootKey = false;
     public bool m_blockKey = false;
 
+    public bool m_grounded = false;
     #endregion
 
     #region Protected Variables
@@ -48,8 +51,8 @@ public class PlayerController : MonoBehaviour {
 
     //oer private vars
     private GameObject m_Camera;
-
-    private Vector3 m_camOffset;
+    private float m_size;
+    private Vector3 m_camOffset; 
     private float m_camDepth = -10;
 
     #endregion
@@ -69,18 +72,15 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
     {
-        m_camOffset = new Vector3(0, 3.5f, m_camDepth);
+        m_camOffset = new Vector3(0, 1.5f, m_camDepth);
         m_rb.fixedAngle = true;
+        m_size = 0.55f;
         Init();
 
 	}
 	// Update is called once per frame
 	void Update () 
     {
-        //get if grounded
-        Vector3 fwd = transform.TransformDirection(Vector3.down);
-        if (Physics.Raycast(transform.position, fwd, 1, 9))
-            Debug.Log("Touching");
 
         //GetInputs really shitty
         if (Input.GetKeyDown(KeyCode.RightArrow))
@@ -109,12 +109,32 @@ public class PlayerController : MonoBehaviour {
             m_jumpKey = false;
 
         //keep up with camera
-        m_Camera.transform.position = transform.position + m_camOffset;
+        m_camOffset.x = transform.position.x;
+        m_Camera.transform.position = m_camOffset;
      
 	}
+
+    void OnCollisionStay2D(Collision2D coll)
+    {
+        foreach (ContactPoint2D tact in coll.contacts)
+        {
+            if (tact.normal == Vector2.up)
+                m_grounded = true;
+        }
+    }
+
+
     // FixedUpdate is called on a timer
     void FixedUpdate()
     {
+        //get if grounded
+        //RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector2.up, m_size, 9);
+        //if (hit.collider != null)
+        //    m_grounded = true;
+        //else
+        //    m_grounded = false;
+
+
         // State machine shenanigans 
         if (!m_initialised)
             return;
@@ -132,6 +152,7 @@ public class PlayerController : MonoBehaviour {
             m_nextGameStateIndex = CharacterStateNames.NullState;
         }
 
+        m_grounded = false;
     }
 
     #endregion
@@ -254,8 +275,6 @@ public class WalkState : PlayerBase
 
     public override void UpdateState()
     {
-        //CHECK IF GROUNDED
-
 
         //input
         if(m_cont.m_rightKey)
@@ -301,6 +320,7 @@ public class WalkState : PlayerBase
 //jumping state
 public class JumpState : PlayerBase
 {
+    private float m_jumpTime;
     public JumpState(PlayerController p_cont)
     {
         m_cont = p_cont;
@@ -309,16 +329,26 @@ public class JumpState : PlayerBase
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         Debug.Log("In Jumping State");
+        m_jumpTime = m_cont.m_jumpDuration;
     }
 
     public override void UpdateState()
     {
+        m_jumpTime -= Time.fixedDeltaTime;
 
-
-        if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
+        if(m_jumpTime > 0)
+        {
+            Vector2 temp = m_cont.m_rb.velocity;
+            temp.y = m_cont.m_jumpSpeed;
+            m_cont.m_rb.velocity = temp;
+        }
+        
+        
+        if(m_cont.m_grounded && m_jumpTime < 0)
         {
             m_cont.ChangeGameState(PlayerController.CharacterStateNames.IdleState);
         }
+        
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
@@ -330,20 +360,24 @@ public class JumpState : PlayerBase
 //Crouching state
 public class CrouchState : PlayerBase
 {
+    Vector3 m_scale;
+
     public CrouchState(PlayerController p_cont)
     {
         m_cont = p_cont;
     }
-
+    
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         Debug.Log("In Crouching State");
+        m_scale = m_cont.transform.localScale;
+        m_scale.y *= 0.5f;
+        m_cont.transform.localScale = m_scale;
+
     }
 
     public override void UpdateState()
     {
-
-
 
         if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
         {
@@ -353,6 +387,7 @@ public class CrouchState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
+        m_scale.y *= 2.0f;
+        m_cont.transform.localScale = m_scale;
     }
 }

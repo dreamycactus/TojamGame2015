@@ -34,6 +34,11 @@ public class Health : MonoBehaviour
     public void TakeDamage(int p_dmg)
     {
         m_currentHealth -= p_dmg;
+
+        if (m_currentHealth < 0)
+        {
+            gameObject.SendMessage("EnterDeathState");
+        }
     }
 
 

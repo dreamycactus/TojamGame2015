@@ -21,12 +21,15 @@ class Griffin : MonoBehaviour {
 	public float elapsedTime;
 	public float speed = 0.1f;
 	private BulletEmitter bEmitter;
+    public float m_disappearDist = 20.0f;
 
 	void Start() {
 		body = this.gameObject.GetComponent<Rigidbody2D>();
 		state = GriffinState.Idle;
 		var mid = GameObject.FindGameObjectWithTag("mid");
-		var players = GameObject.FindGameObjectsWithTag("Player");
+		GameObject[] players = new GameObject[2];
+		players[0] = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
+		players[1] = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();
 
 		if (transform.position.x < mid.transform.position.x) {
 			playerIndex = 0;
@@ -57,6 +60,11 @@ class Griffin : MonoBehaviour {
 				//float x = transform.localPosition.x + speed;
 				float y = sinKY * Mathf.Sin(elapsedTime * sinKX) + idealHeight;
 				transform.position = new Vector3(transform.position.x, y, 0);
+
+				if (Mathf.Abs(transform.position.x - targetPlayer.transform.position.x) > m_disappearDist)
+				{
+					Destroy(gameObject);    //Destroys enemy if player gets too far
+				}
 				break;
 			case GriffinState.Shoot:
 				break;

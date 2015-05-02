@@ -44,7 +44,11 @@ public class Bullet : MonoBehaviour
             Free();
             Debug.Log("Player Hit");
         }
-
+        else if (other.tag != "Enemy")
+        {
+            Free();
+        }
+        
     }
 }
 

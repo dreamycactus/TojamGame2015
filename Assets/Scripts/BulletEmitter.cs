@@ -51,7 +51,7 @@ public class BulletEmitter : MonoBehaviour
 		}
 	}
 
-	public void Update() {
+	public void FixedUpdate() {
 		if (m_autoFire)
         {
             foreach (var p in bPatterns)

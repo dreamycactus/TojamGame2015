@@ -227,7 +227,6 @@ public class IdlePlayer : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("In Idle State");
     }
 
     public override void UpdateState()
@@ -270,7 +269,6 @@ public class WalkState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("In Walking State");
     }
 
     public override void UpdateState()
@@ -336,7 +334,6 @@ public class JumpState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("In Jumping State");
         if (p_prevState != PlayerController.CharacterStateNames.ShootState)
             m_jumpTime = m_cont.m_jumpDuration;
         else

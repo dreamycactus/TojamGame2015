@@ -93,50 +93,6 @@ public class PlayerController : MonoBehaviour {
 	void Update () 
     {
 
-        //GetInputs really shitty
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            m_Direction = 1;
-            m_rightKey = true;
-        }
-        if (Input.GetKeyUp(KeyCode.RightArrow))
-            m_rightKey = false;
-
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            m_Direction = -1;
-            m_leftKey = true;
-        }
-           
-        if (Input.GetKeyUp(KeyCode.LeftArrow))
-            m_leftKey = false;
-
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-            m_upKey = true;
-        if (Input.GetKeyUp(KeyCode.UpArrow))
-            m_upKey = false;
-
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-            m_downKey = true;
-        if (Input.GetKeyUp(KeyCode.DownArrow))
-            m_downKey = false;
-
-        if (Input.GetKeyDown(KeyCode.Space))
-            m_jumpKey = true;
-        if (Input.GetKeyUp(KeyCode.Space))
-            m_jumpKey = false;
-
-        if (Input.GetKeyDown(KeyCode.Z))
-            m_chompKey = true;
-        if (Input.GetKeyUp(KeyCode.Z))
-            m_chompKey = false;
-
-        if (Input.GetKeyDown(KeyCode.X))
-            m_shootKey = true;
-        if (Input.GetKeyUp(KeyCode.X))
-            m_shootKey = false;
-
-
         //keep up with camera
         m_camOffset.x = transform.position.x;
         m_Camera.transform.position = m_camOffset;

@@ -25,7 +25,6 @@ class Griffin : MonoBehaviour {
 	void Start() {
 		body = this.gameObject.GetComponent<Rigidbody2D>();
 		state = GriffinState.Idle;
-		var mid = GameObject.FindGameObjectWithTag("mid");
 		GameObject[] players = new GameObject[2];
 		players[0] = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
 		players[1] = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();

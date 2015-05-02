@@ -64,15 +64,20 @@ class Griffin : MonoBehaviour {
 				float y = sinKY * Mathf.Sin(elapsedTime * sinKX) + idealHeight;
 				transform.position = new Vector3(transform.position.x, y, 0);
 
-                if (Mathf.Abs(transform.position.x - targetPlayer.transform.position.x) > m_disappearDist)
-                {
-                    Destroy(gameObject);    //Destroys enemy if player gets too far
-                }
+				if (Mathf.Abs(transform.position.x - targetPlayer.transform.position.x) > m_disappearDist)
+				{
+					Destroy(gameObject);    //Destroys enemy if player gets too far
+				}
 				break;
 			case GriffinState.Shoot:
 				break;
 			case GriffinState.Death:
+				GameObject exp = Instantiate(Resources.Load("Explosion")) as GameObject;
+				exp.transform.position = transform.position;
 				break;
 		}
+	}
+	void OnCollisionEnter(Collision col) {
+		state = GriffinState.Death;
 	}
 }

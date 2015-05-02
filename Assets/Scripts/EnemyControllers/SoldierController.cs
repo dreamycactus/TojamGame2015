@@ -20,15 +20,19 @@ public class SoldierController : MonoBehaviour {
     public float m_acceleration = 10.0f;
     public Enums.EnemyApproachDirection m_direction;
 
-    private GameObject m_playerOne;
-    private GameObject m_playerTwo;
-
     private GameObject m_target;
 
     public float m_approachDist = 10.0f;
     public float m_shootDist = 5.0f;
+    public float m_disappearDist = 10.0f;
 
     private BulletEmitter m_bulletEmitter;
+
+    private Animator m_animator;
+
+    private float m_shootTimer = 0;
+
+    public bool m_standShoot = false;
 
 	// Use this for initialization
 	void Start () {
@@ -38,11 +42,22 @@ public class SoldierController : MonoBehaviour {
 
         m_bulletEmitter = gameObject.GetComponent<BulletEmitter>();
 
-        m_playerOne = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
-        //m_playerTwo = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();
+        GameObject l_playerOne = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
+        GameObject l_playerTwo = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();
 
-        Physics2D.IgnoreCollision(m_playerOne.GetComponent<Collider2D>(), GetComponent<Collider2D>());
-        //Physics2D.IgnoreCollision(m_playerTwo.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(l_playerOne.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+        Physics2D.IgnoreCollision(l_playerTwo.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+
+        m_animator = gameObject.GetComponent<Animator>();
+
+		if (Mathf.Abs(transform.position.x - l_playerOne.transform.position.x) < Mathf.Abs(transform.position.x - l_playerTwo.transform.position.x))
+		{
+			m_target = l_playerOne;
+		}
+		else
+		{
+			m_target = l_playerTwo;
+		}
 	}
 	
 	// Update is called once per frame
@@ -52,11 +67,9 @@ public class SoldierController : MonoBehaviour {
         {
             case SoldierState.Idle:
 
-                if (Mathf.Abs(transform.position.x - m_playerOne.transform.position.x) < m_approachDist)
+                if (Mathf.Abs(transform.position.x - m_target.transform.position.x) < m_approachDist)
                 {
-                    m_target = m_playerOne;
-                    
-                    if (transform.position.x - m_playerOne.transform.position.x < 0)
+                    if (transform.position.x - m_target.transform.position.x < 0)
                     {
                         m_direction = Enums.EnemyApproachDirection.Right;
                     }
@@ -67,22 +80,6 @@ public class SoldierController : MonoBehaviour {
                     
                     m_currentState = SoldierState.Approach;
                 }
-
-                /*
-                if (Mathf.Abs(transform.position.x - m_playerTwo.transform.position.x) < m_approachDist)
-                {
-                    if (transform.position.x - m_playerTwo.transform.position.x < 0)
-                    {
-                        m_direction = Enums.EnemyApproachDirection.Right;
-                    }
-                    else
-                    {
-                        m_direction = Enums.EnemyApproachDirection.Left;
-                    }
-                    
-                    m_currentState = SoldierState.Approach;
-                }
-                 */
 
                 break;
             case SoldierState.Approach:
@@ -97,10 +94,22 @@ public class SoldierController : MonoBehaviour {
                     else
                         m_direction = Enums.EnemyApproachDirection.Left;
 
-                    //m_rb.velocity = new Vector2(0.0f, 0.0f);    //Stops soldier in place to shoot
+                    
+                    if (m_standShoot)
+                    {
+                        m_rb.velocity = new Vector2(0.0f, 0.0f);    //Stops soldier in place to shoot
+                        m_animator.SetBool("Stand", true);
+                    }
+                    else
+                    {
+                        m_animator.SetBool("Strafe", true);
+                    }
+
                     m_currentState = SoldierState.Shoot;    //Switch to shooting state
 
                     m_bulletEmitter.ToggleAutoFire();
+
+                    m_shootTimer = 0.1f;
                 }
                 break;
 
@@ -108,7 +117,27 @@ public class SoldierController : MonoBehaviour {
 
                 m_bulletEmitter.Target = m_target.transform.position;
 
-                ApplyMovement(true);
+                if (m_shootTimer > 0)
+                {
+                    m_shootTimer -= Time.deltaTime;
+
+                    if (m_shootTimer <= 0)
+                    {
+                        Debug.Log("Shoot animate");
+                        m_animator.SetTrigger("Shoot");
+                        m_shootTimer = Constants.NORMAL_BULLET_PERIOD;
+                    }
+                }
+
+                if (!m_standShoot)
+                {
+                    ApplyMovement(true);
+                }
+
+                if (Mathf.Abs(transform.position.x - m_target.transform.position.x) > m_disappearDist)
+                {
+                    Destroy(gameObject);    //Destroys enemy if player gets too far
+                }
 
                 break;
 

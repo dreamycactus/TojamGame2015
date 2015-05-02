@@ -82,7 +82,6 @@ public class InputHandler : MonoBehaviour {
             m_player1.m_shootKey = false;
 
 
-
         /****************************************************
          * PLAYER 2 INPUT
          *///////////////////////////////////////////////////

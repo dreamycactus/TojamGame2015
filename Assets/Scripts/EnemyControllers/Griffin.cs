@@ -13,7 +13,6 @@ class Griffin : MonoBehaviour {
 	}
 	Rigidbody2D body;
 	GriffinState state;
-	int playerIndex;
 	GameObject targetPlayer;
 	float idealHeight;
 	public float sinKY= 0.1f;
@@ -31,14 +30,18 @@ class Griffin : MonoBehaviour {
 		players[0] = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
 		players[1] = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();
 
-		if (transform.position.x < mid.transform.position.x) {
-			playerIndex = 0;
+
+		if (Mathf.Abs(transform.position.x - players[0].transform.position.x) < Mathf.Abs(transform.position.x - players[1].transform.position.x))
+		{
+			targetPlayer = players[0];
 			speed = -Math.Abs(speed);
-		} else {
-			playerIndex = 1;
+		}
+		else
+		{
+			targetPlayer = players[1];
 			speed = Math.Abs(speed);
 		}
-		targetPlayer = players[playerIndex];
+
 		idealHeight = transform.position.y;
 		bEmitter = gameObject.GetComponent<BulletEmitter>();
 	}

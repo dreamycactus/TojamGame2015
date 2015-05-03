@@ -44,7 +44,7 @@ public class Health : MonoBehaviour
     {
 		if (gameObject.tag == "Player") {
 			Rigidbody2D body = gameObject.GetComponent<Rigidbody2D>();
-			float force = 300 * p_dmg / 5 * Mathf.Sign(transform.position.x- col.transform.position.x);
+			float force = 200 * p_dmg / 5 * Mathf.Sign(transform.position.x- col.transform.position.x);
 			body.AddForce(new Vector2(force, 0), ForceMode2D.Impulse);
 		}
         if(blocking)

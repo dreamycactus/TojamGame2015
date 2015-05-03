@@ -853,8 +853,8 @@ public class HurtState : PlayerBase
         if (m_hurtTimer > 0)
         {
             /// new code
-            float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_maxSpeed);
-            m_cont.m_rb.AddForce(new Vector2(-1f * m_cont.m_Direction * m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.5f* (-1f * m_cont.m_Direction * m_cont.m_movementMultiplier * l_accelerationMultiplier)));
+            //float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_maxSpeed);
+           // m_cont.m_rb.AddForce(new Vector2(-1f * m_cont.m_Direction * m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.5f* (-1f * m_cont.m_Direction * m_cont.m_movementMultiplier * l_accelerationMultiplier)));
             ///
         }
 

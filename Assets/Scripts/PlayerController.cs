@@ -11,25 +11,28 @@ public class PlayerController : MonoBehaviour {
 	#region Public Variables
    
 
-    public float m_movementMultiplier = 5.0f; //movement speed multiplier
-    public float m_maxSpeed = 5.0f; //a speed cap for horizontal movement
-    public float m_jumpSpeed = 15.0f; //how fast you jump up
-    public float m_jumpDuration = 0.3f; //how long you're jumping for
-    public float m_chomSpeed = 10.0f; //how fast you move while chomping
-    public float m_chompDuration = 0.5f; //how long a chomp state is
-    public float m_chompWaitTime = 0.2f; //how long you wait at the end of a chomp
-    public float m_shootDuration = 0.4f; //how long a shoot animation state is
-    public float m_ShootDelayTime = 0.3f; //how long you wait before firing
-    public float m_bulletSpeed = 20.0f; //how fast the bullets fly
-    public float m_stompPauseDuration = 0.1f; //how long you hang in the air before stomping
-    public float m_stompSpeed = 25.0f; //how fast you fall when stomping
-    public float m_blockDuration = 0.5f; // length of block
-    public float m_maxBlockCoolDown = 0.5f; // how long between blocks (max time)
+    public float m_movementMultiplier; //movement speed multiplier
+    public float m_maxSpeed; //a speed cap for horizontal movement
+    public float m_jumpSpeed; //how fast you jump up
+    public float m_jumpDuration; //how long you're jumping for
+    public float m_chomSpeed; //how fast you move while chomping
+    public float m_chompDuration; //how long a chomp state is
+    public float m_chompWaitTime; //how long you wait at the end of a chomp
+    public float m_shootDuration; //how long a shoot animation state is
+    public float m_ShootDelayTime; //how long you wait before firing
+    public float m_bulletSpeed;//how fast the bullets fly
+    public float m_stompPauseDuration; //how long you hang in the air before stomping
+    public float m_stompSpeed;//how fast you fall when stomping
+    public float m_blockDuration; // length of block
+    public float m_maxBlockCoolDown;// how long between blocks (max time)
     public float m_blockCooldown;  //inner cooldown used by class, starts at maxBlockCoolDown
-    public float m_dashSpeed = 15.0f; //how fast you dash
-    public float m_dashDuration = 0.7f;
-    public float m_maxDashCoolDown = 1.0f; // cooldown between dashes
+    public float m_dashSpeed; //how fast you dash
+    public float m_dashDuration;
+    public float m_maxDashCoolDown; // cooldown between dashes
     public float m_dashCooldown; //inner cooldown used by clss, starts at maxDashCooldown
+    public float m_riseDuration; //how long you are rising for
+    public float m_riseSpeedX; // vertical rise speed
+    public float m_riseSpeedY; // horizontal rise speed
 
     public int m_Direction = 1; //direcitonal facing
     public Rigidbody2D m_rb;
@@ -68,7 +71,8 @@ public class PlayerController : MonoBehaviour {
         ShootState = 6,
         StompState = 7,
         BlockState = 8,
-        DashState = 9
+        DashState = 9,
+        RisingState = 10
     }
     private Dictionary<CharacterStateNames, PlayerBase> m_gameStateDictionary = new Dictionary<CharacterStateNames, PlayerBase>();
     private PlayerBase m_currentGameState = null;
@@ -99,6 +103,28 @@ public class PlayerController : MonoBehaviour {
 	// Use this for initialization
 	void Start () 
     {
+//////////////////////////////////////////////////////////////////////////
+        m_movementMultiplier = 100000.0f; //movement speed multiplier
+        m_maxSpeed = 7.0f; //a speed cap for horizontal movement
+        m_jumpSpeed = 15.0f; //how fast you jump up
+        m_jumpDuration = 0.3f; //how long you're jumping for
+        m_chomSpeed = 10.0f; //how fast you move while chomping
+        m_chompDuration = 0.5f; //how long a chomp state is
+        m_chompWaitTime = 0.2f; //how long you wait at the end of a chomp
+        m_shootDuration = 0.4f; //how long a shoot animation state is
+        m_ShootDelayTime = 0.3f; //how long you wait before firing
+        m_bulletSpeed = 20.0f; //how fast the bullets fly
+        m_stompPauseDuration = 0.1f; //how long you hang in the air before stomping
+        m_stompSpeed = 25.0f; //how fast you fall when stomping
+        m_blockDuration = 0.5f; // length of block
+        m_maxBlockCoolDown = 0.5f; // how long between blocks (max time)
+        m_dashSpeed = 15.0f; //how fast you dash
+        m_dashDuration = 0.5f;
+        m_maxDashCoolDown = 1.0f; // cooldown between dashes
+        m_riseDuration = 0.5f; //how long you are rising for
+        m_riseSpeedX = 15.0f; // vertical rise speed
+        m_riseSpeedY = 15.0f; // horizontal rise speed
+//////////////////////////////////////////////////////////////////////////
         m_camOffset = new Vector3(0, 1.5f, m_camDepth);
         m_rb.fixedAngle = true;
         m_size = 0.55f;
@@ -176,10 +202,10 @@ public class PlayerController : MonoBehaviour {
         m_gameStateDictionary.Add(CharacterStateNames.StompState, new StompState(this));
         m_gameStateDictionary.Add(CharacterStateNames.BlockState, new BlockState(this));
         m_gameStateDictionary.Add(CharacterStateNames.DashState, new DashState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.RisingState, new RisingState(this));
 
         //start the state machine
         ChangePlayerState(CharacterStateNames.IdleState); //starts in the idle
-
 
         m_initialised = true;
 
@@ -211,7 +237,6 @@ public abstract class PlayerBase
 
     public PlayerBase()
     {
-
     }
 
     public PlayerBase(PlayerController p_cont)
@@ -219,20 +244,16 @@ public abstract class PlayerBase
         m_cont = p_cont;
     }
 
-
     public virtual void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-
     }
 
     public virtual void UpdateState()
     {
-
     }
 
     public virtual void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
     }
 }
 
@@ -279,12 +300,10 @@ public class IdlePlayer : PlayerBase
         {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.DashState);
         }
-
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
     }
 }
 
@@ -298,52 +317,48 @@ public class WalkState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
+        Debug.Log("Walking");
     }
 
     public override void UpdateState()
     {
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         //input
+        /// new code
+        float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_maxSpeed); 
+        ///
         if(m_cont.m_rightKey)
         {
-            m_cont.m_rb.velocity = new Vector2(m_cont.m_movementMultiplier, m_cont.m_rb.velocity.y);
+            m_cont.m_rb.AddForce(new Vector2(m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.0f));
+            //m_cont.m_rb.velocity = new Vector2(m_cont.m_movementMultiplier, m_cont.m_rb.velocity.y);
         }
         if (m_cont.m_leftKey)
         {
-            m_cont.m_rb.velocity = new Vector2(-1.0f*m_cont.m_movementMultiplier, m_cont.m_rb.velocity.y);
+            m_cont.m_rb.AddForce(new Vector2(-m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.0f));
+            //m_cont.m_rb.velocity = new Vector2(-1.0f * m_cont.m_movementMultiplier, m_cont.m_rb.velocity.y);
         }
         if (m_cont.m_jumpKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.JumpState);
-        }
-        if (m_cont.m_downKey)
-        {
+        if (m_cont.m_downKey && m_cont.m_grounded)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.CrouchState);
-        }
         if (m_cont.m_shootKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
-        }
         if (m_cont.m_chompKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
-        }
         if (m_cont.m_blockKey && m_cont.m_blockCooldown < 0)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.BlockState);
-        }
         if (m_cont.m_dashKey && m_cont.m_dashCooldown < 0)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.DashState);
-        }
 
         //Clamp speed
-        if (Mathf.Abs(m_cont.m_rb.velocity.x) > m_cont.m_maxSpeed)
-        {
-            float spd = m_cont.m_rb.velocity.x;
-            spd = Mathf.Clamp(spd, -m_cont.m_maxSpeed, m_cont.m_maxSpeed);
-            m_cont.m_rb.velocity = new Vector2(spd, m_cont.m_rb.velocity.y);
-        }
+       
+
+        //if (Mathf.Abs(m_cont.m_rb.velocity.x) > m_cont.m_maxSpeed)
+        //{
+        //    float spd = m_cont.m_rb.velocity.x;
+        //    spd = Mathf.Clamp(spd, -m_cont.m_maxSpeed, m_cont.m_maxSpeed);
+        //    m_cont.m_rb.velocity = new Vector2(spd, m_cont.m_rb.velocity.y);
+        //}
 
         //standing still
         if (!m_cont.m_rightKey && !m_cont.m_leftKey && !m_cont.m_jumpKey && !m_cont.m_downKey)
@@ -351,12 +366,10 @@ public class WalkState : PlayerBase
             m_cont.m_rb.velocity = new Vector2(0, m_cont.m_rb.velocity.y);
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
         }
-            
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
     }
 }
 
@@ -389,25 +402,17 @@ public class JumpState : PlayerBase
             m_cont.m_rb.velocity = temp;
         }
         if (m_cont.m_shootKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
-        }
         if (m_cont.m_chompKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.StompState);
-        }
-
 
         if(m_cont.m_grounded && m_jumpTime < 0)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
-        }
         
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
     }
 }
 
@@ -432,26 +437,18 @@ public class CrouchState : PlayerBase
     {
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         if (m_cont.m_chompKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
-        }
         if (m_cont.m_shootKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
-        }
+        if (m_cont.m_jumpKey && m_cont.m_grounded)
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.RisingState);
         if (m_cont.m_blockKey && m_cont.m_blockCooldown < 0)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.BlockState);
-        }
         if (m_cont.m_dashKey && m_cont.m_dashCooldown < 0)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.DashState);
-        }
 
         if (!m_cont.m_downKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
-        }
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
@@ -522,10 +519,7 @@ public class ChompState : PlayerBase
             m_waitTime -= Time.fixedDeltaTime;
         }
         if(m_waitTime <= 0)
-        {
             m_cont.ChangePlayerState(m_lastState);
-        }
-
 
     }
 
@@ -586,10 +580,7 @@ public class ShootState : PlayerBase
                 bullet.GetComponent<Rigidbody2D>().velocity = m_shootDirection*m_cont.m_bulletSpeed;
                 m_hasShot = true;
             }
-
-
         }
-
 
         // NO MOVEMENT;
         m_cont.m_rb.velocity = Vector2.zero;
@@ -604,6 +595,7 @@ public class ShootState : PlayerBase
 
 }
 
+//while butt stomping 
 public class StompState : PlayerBase
 {
     private float m_stompTime;
@@ -631,9 +623,7 @@ public class StompState : PlayerBase
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_stompTime -= Time.fixedDeltaTime;
         if (m_stompTime > 0)
-        {
             m_cont.m_rb.velocity = Vector2.zero;
-        }
         if (m_hasStomped == false)
         {
             m_hitbox = Object.Instantiate(Resources.Load("ChompBox", typeof(GameObject))) as GameObject;
@@ -644,9 +634,7 @@ public class StompState : PlayerBase
             m_hasStomped = true;
         }
         if(m_hitbox != null)
-        {
             m_hitbox.transform.position = m_cont.transform.position + new Vector3(0, -2, 0);
-        }
 
         if (m_stompTime < 0 && !flag)
         {
@@ -670,6 +658,7 @@ public class StompState : PlayerBase
     }
 }
 
+//while blocking
 public class BlockState : PlayerBase
 {
     private float m_blockTime;
@@ -691,13 +680,9 @@ public class BlockState : PlayerBase
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
 
         if (!m_cont.m_blockKey)
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
-        }
         if (m_blockTime <= 0) // out of time
-        {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
-        }
 
     }
 
@@ -709,6 +694,7 @@ public class BlockState : PlayerBase
 
 }
 
+//While Dashing
 public class DashState : PlayerBase
 {
     private float m_dashTime;
@@ -744,5 +730,46 @@ public class DashState : PlayerBase
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
         m_cont.m_dashCooldown = m_cont.m_maxDashCoolDown;
+    }
+}
+
+//While doing a Rising Attack
+public class RisingState : PlayerBase
+{
+    private float m_riseTime;
+    private int m_direction;
+    public RisingState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        m_riseTime = m_cont.m_riseDuration;
+        m_direction = m_cont.m_Direction;
+        Debug.Log("Rising!");
+    }
+
+    public override void UpdateState()
+    {
+        m_riseTime -= Time.fixedDeltaTime;
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
+
+        if(m_riseTime > 0)
+        {
+            Vector2 temp = new Vector2(m_cont.m_riseSpeedX * m_direction, m_cont.m_riseSpeedY);
+            m_cont.m_rb.velocity = temp;
+        }
+        if (m_riseTime <= 0)
+        {
+            Vector2 temp = new Vector2(0.0f, m_cont.m_rb.velocity.y);
+            m_cont.m_rb.velocity = temp;
+        }
+
+        if (m_riseTime <= 0 && m_cont.m_grounded)
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
+    }
+
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
     }
 }

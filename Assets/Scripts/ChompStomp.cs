@@ -7,7 +7,7 @@ using System.Collections;
 public class ChompStomp : MonoBehaviour {
 
     #region Public Variables
-    public int m_dmg = 5;
+    public int m_dmg = 1;
     public Collider2D l_shootingPlayer;
 
     #endregion
@@ -37,10 +37,10 @@ public class ChompStomp : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Enemy")
+        if (other.tag == "Enemy" || other.tag == "Player")
         {
             other.GetComponent<Health>().TakeDamage(m_dmg);
-            Debug.Log("Player Hit");
+            Destroy(this);
         }
 
     }

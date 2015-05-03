@@ -43,17 +43,13 @@ public class Fireball : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Enemy")
+        if (other.tag == "Enemy" || other.tag == "Player")
         {
             other.GetComponent<Health>().TakeDamage(m_dmg);
             Destroy(this.gameObject);
             Debug.Log("Player Hit");
         }
-        else if (other.tag != "Enemy")
-        {
-            Destroy(this.gameObject);
-        }
-        
+
     }
 
     #endregion

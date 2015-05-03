@@ -15,13 +15,17 @@ public class Bullet : MonoBehaviour
 	public float m_currentLife;
 	public int m_dmg = 1;
 	public bool m_explodeOnImpact = false;
+	public bool destroyOnFree = true;
 	public Bullet ()
 	{
 	}
 		
 	public void Free() {
         m_currentLife = 0;
-        
+        if (destroyOnFree) {
+			Destroy(gameObject);
+		}
+
         if (this.gameObject != null) {
 			BulletManager.Inst.FreeBullet(this.gameObject);
 		}

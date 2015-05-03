@@ -1,0 +1,198 @@
+fileFormatVersion: 2
+guid: 6f5eb8efbe4c9ff46bd979668ed3d9dd
+timeCreated: 1430677008
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: knight shoot_0
+    21300002: knight shoot_1
+    21300004: knight shoot_2
+    21300006: knight shoot_3
+    21300008: knight shoot_4
+    21300010: knight shoot_5
+    21300012: knight shoot_6
+    21300014: knight shoot_7
+    21300016: knight shoot_8
+    21300018: knight shoot_9
+    21300020: knight shoot_10
+    21300022: knight shoot_11
+    21300024: knight shoot_12
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: knight shoot_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_1
+      rect:
+        serializedVersion: 2
+        x: 597
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_2
+      rect:
+        serializedVersion: 2
+        x: 1194
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_3
+      rect:
+        serializedVersion: 2
+        x: 1791
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_4
+      rect:
+        serializedVersion: 2
+        x: 2388
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_5
+      rect:
+        serializedVersion: 2
+        x: 2985
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_6
+      rect:
+        serializedVersion: 2
+        x: 3582
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_7
+      rect:
+        serializedVersion: 2
+        x: 4179
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_8
+      rect:
+        serializedVersion: 2
+        x: 4776
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_9
+      rect:
+        serializedVersion: 2
+        x: 5373
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_10
+      rect:
+        serializedVersion: 2
+        x: 5970
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_11
+      rect:
+        serializedVersion: 2
+        x: 6567
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: knight shoot_12
+      rect:
+        serializedVersion: 2
+        x: 7164
+        y: 0
+        width: 597
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

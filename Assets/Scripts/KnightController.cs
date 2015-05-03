@@ -165,6 +165,7 @@ class KnightController : MonoBehaviour {
 					// Spawn punch
 					pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
 					pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+					pHitbox.GetComponent<SpriteRenderer>().enabled = false;
 					var col = pHitbox.GetComponent<BoxCollider2D>();
 					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * PUNCH[OFFSETX], PUNCH[OFFSETY]);
 					var hitbox = pHitbox.GetComponent<Hitbox>();
@@ -189,6 +190,7 @@ class KnightController : MonoBehaviour {
 				if (moveTimer > ROK_PUNCH[WINDUP] && !movedUsed) {
 					pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
 					pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+					pHitbox.GetComponent<SpriteRenderer>().enabled = true;
 					var col = pHitbox.GetComponent<BoxCollider2D>();
 					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
 					col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);
@@ -197,6 +199,7 @@ class KnightController : MonoBehaviour {
 					hitbox.ttl = 10;
 					pHitbox.GetComponent<Rigidbody2D>().velocity = new Vector2(-Math.Sign(transform.localScale.x)*20, 0) + body.velocity;
 					movedUsed = true;
+					m_animator.SetTrigger("Shoot");
 				}
 				if (moveTimer > ROK_PUNCH[MOVE_DURATION]) {
 

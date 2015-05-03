@@ -339,6 +339,12 @@ class KnightController : MonoBehaviour {
 		moveTimer = 0;
 	}
 
+	void EnterDeathState() {
+		GameObject exp = ExplosionManager.Inst.GetExplosion();
+		exp.transform.position = transform.position;
+		Destroy(gameObject);
+	}
+
 	private void FlipSprite() {
 		transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
 	}

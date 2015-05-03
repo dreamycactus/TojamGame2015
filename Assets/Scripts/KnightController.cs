@@ -22,8 +22,8 @@ class KnightController : MonoBehaviour {
 		LASER_MAX = 3,
 		OFFSETX = 3,
 		OFFSETY = 4,
-		WIDTH = 4,
-		HEIGHT = 5;
+		WIDTH = 5,
+		HEIGHT = 6;
 	enum Move {
 		PUNCH,
 		JUMP,
@@ -34,9 +34,9 @@ class KnightController : MonoBehaviour {
 	}
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
-	readonly float[] JUMP			= { 0.2f, 0.1f };
-	readonly float[] PUNCH			= { 0.01f, 0.5f, 0.5f, 0.5f, -0.2f };
-	readonly float[] ROK_PUNCH		= { 0.2f, 0.2f, 0.3f, 0.5f, -0.4f, 0.5f, 0.5f };
+	readonly float[] JUMP			= { 0.1f, 0.1f };
+	readonly float[] PUNCH			= { 0.01f, 0.1f, 0.1f, 0.5f, -0.2f };
+	readonly float[] ROK_PUNCH		= { 0.3f, 0.3f, 0.5f, 0.5f, -0.4f, 2.0f, 1.0f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
 	readonly float HURT				= 0.3f;
 
@@ -167,9 +167,15 @@ class KnightController : MonoBehaviour {
 					pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 					pHitbox.GetComponent<SpriteRenderer>().enabled = false;
 					var col = pHitbox.GetComponent<BoxCollider2D>();
-					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * PUNCH[OFFSETX], PUNCH[OFFSETY]);
+					col.size = new Vector2(4, 2);
+					if (-transform.localScale.x > 0) {
+						col.offset = new Vector2(2, PUNCH[OFFSETY]);
+					} else {
+						col.offset = new Vector2(-2, PUNCH[OFFSETY]);
+					}
 					var hitbox = pHitbox.GetComponent<Hitbox>();
-					hitbox.l_shootingPlayer = col;
+					hitbox.l_shootingPlayer = GetComponent<BoxCollider2D>();
+					hitbox.m_dmg = 5;
 					hitbox.ttl = PUNCH[MOVE_DURATION];
 					movedUsed = true;
 					if (isLeft) {
@@ -194,11 +200,13 @@ class KnightController : MonoBehaviour {
 					if (transform.localScale.x < 0) {
 						pHitbox.transform.localScale = new Vector3(-1 * pHitbox.transform.localScale.x, pHitbox.transform.localScale.y, pHitbox.transform.localScale.z);
 					}
+
 					var col = pHitbox.GetComponent<BoxCollider2D>();
-					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
+					col.offset = new Vector2(0, ROK_PUNCH[OFFSETY]);
 					col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);
 					var hitbox = pHitbox.GetComponent<Hitbox>();
-					hitbox.l_shootingPlayer = col;
+					hitbox.l_shootingPlayer = GetComponent<BoxCollider2D>();
+					hitbox.m_dmg = 3;
 					hitbox.ttl = 10;
 					pHitbox.GetComponent<Rigidbody2D>().velocity = new Vector2(-Math.Sign(transform.localScale.x)*20, 0) + body.velocity;
 					movedUsed = true;
@@ -207,7 +215,7 @@ class KnightController : MonoBehaviour {
 				if (moveTimer > ROK_PUNCH[MOVE_DURATION]) {
 
 				}
-				if (moveTimer > ROK_PUNCH[WINDDOWN]) {
+				if (moveTimer > ROK_PUNCH[WINDDOWN] + ROK_PUNCH[MOVE_DURATION] + ROK_PUNCH[WINDUP]) {
 					state = State.FREE;
 				}
 				break;
@@ -250,9 +258,15 @@ class KnightController : MonoBehaviour {
 						col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
 						col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);
 						var hitbox = pHitbox.GetComponent<Hitbox>();
-						hitbox.l_shootingPlayer = col;
+						hitbox.l_shootingPlayer = GetComponent<BoxCollider2D>();
+						hitbox.m_dmg = 3;
 						hitbox.ttl = 10;
 						pHitbox.GetComponent<Rigidbody2D>().velocity = new Vector2(-Math.Sign(transform.localScale.x) * 20 + body.velocity.x, -10);
+						if (-transform.localScale.x < 0) {
+							pHitbox.transform.Rotate(Vector3.forward, 30);
+						} else {
+							pHitbox.transform.Rotate(Vector3.back, 30);
+						}
 						movedUsed2 = true;
 						queuedMove = Move.NONE;
 						body.velocity = new Vector2(0, 0);
@@ -264,7 +278,7 @@ class KnightController : MonoBehaviour {
 				if (moveTimer2 > ROK_PUNCH[WINDUP] + ROK_PUNCH[MOVE_DURATION]) {
 					body.gravityScale = 15;
 				}
-				if (movedUsed2 && body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED && !landed && movedUsed) {
+				if (!movedUsed2 && body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED && !landed && movedUsed) {
 					body.AddForce(new Vector2(extentX * 15.0f, 0), ForceMode2D.Impulse);
 				}
 				if (landed && movedUsed && moveTimer > JUMP[WINDDOWN]) {

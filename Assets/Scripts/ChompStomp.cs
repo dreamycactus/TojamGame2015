@@ -1,14 +1,13 @@
 ﻿/*
- * For the Dragon's fireball Attack
+ * The Hit box code for the chomps and stomps for the Dragon
  */
 using UnityEngine;
 using System.Collections;
 
-public class Fireball : MonoBehaviour {
+public class ChompStomp : MonoBehaviour {
 
-	#region Public Variables
-    public float m_currentLife = 3.0f;
-	private int m_dmg = 1;
+    #region Public Variables
+    public int m_dmg = 5;
     public Collider2D l_shootingPlayer;
 
     #endregion
@@ -31,29 +30,19 @@ public class Fireball : MonoBehaviour {
         Physics2D.IgnoreCollision(l_shootingPlayer, GetComponent<Collider2D>());
     }
 
-	public void Update() {
-		if (m_currentLife > 0)
-        {
-            m_currentLife -= Time.deltaTime;
-		    if (m_currentLife < 0) {
-                Destroy(this.gameObject);
-		    }
-        }
-	}
+    public void Update()
+    {
+
+    }
 
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Enemy")
         {
             other.GetComponent<Health>().TakeDamage(m_dmg);
-            Destroy(this.gameObject);
             Debug.Log("Player Hit");
         }
-        else if (other.tag != "Enemy")
-        {
-            Destroy(this.gameObject);
-        }
-        
+
     }
 
     #endregion

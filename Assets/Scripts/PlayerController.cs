@@ -705,6 +705,7 @@ public class StompState : PlayerBase
 public class BlockState : PlayerBase
 {
     private float m_blockTime;
+    private GameObject Shield;
     public BlockState(PlayerController p_cont)
     {
         m_cont = p_cont;
@@ -715,12 +716,18 @@ public class BlockState : PlayerBase
         m_cont.GetComponent<Health>().Blocking = true;
         m_blockTime = m_cont.m_blockDuration;
         //Debug.Log("Blocking");
+        Shield = Object.Instantiate(Resources.Load("DragonShield", typeof(GameObject))) as GameObject;
+        Vector3 l_facing = Shield.transform.localScale;
+        l_facing.x = m_cont.m_Direction*-1;
+        Shield.transform.localScale = l_facing;
+        Shield.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction*2, 0,0);;
     }
 
     public override void UpdateState()
     {
         m_blockTime -= Time.fixedDeltaTime;
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
+        Shield.transform.position = (m_cont.transform.position + new Vector3(m_cont.m_Direction * 2, 0, 0));
 
         if (!m_cont.m_blockKey)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
@@ -733,6 +740,7 @@ public class BlockState : PlayerBase
     {
         m_cont.GetComponent<Health>().Blocking = false;
         m_cont.m_blockCooldown = m_cont.m_maxBlockCoolDown;
+        Object.Destroy(Shield);
     }
 
 }

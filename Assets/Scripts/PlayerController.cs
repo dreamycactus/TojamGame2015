@@ -145,6 +145,7 @@ public class PlayerController : MonoBehaviour {
         }
 
         m_grounded = false;
+
     }
 
     #endregion

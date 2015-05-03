@@ -501,7 +501,7 @@ public class ChompState : PlayerBase
         {
             /// new code
             float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_chomSpeed);
-            m_cont.m_rb.AddForce(new Vector2(m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.0f));
+            m_cont.m_rb.AddForce(new Vector2(m_cont.m_Direction*m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.0f));
             ///
             //Vector2 temp = m_cont.m_rb.velocity;
             //temp.x = m_cont.m_chomSpeed*m_cont.m_Direction;

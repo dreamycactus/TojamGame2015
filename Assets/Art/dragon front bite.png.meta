@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 3052d248e9cf9a14eafd70836d0ae17e
-timeCreated: 1430604374
+timeCreated: 1430676418
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -71,7 +71,7 @@ TextureImporter:
     - name: dragon front bite_1
       rect:
         serializedVersion: 2
-        x: 683
+        x: 685
         y: 4
         width: 683
         height: 512
@@ -81,7 +81,7 @@ TextureImporter:
     - name: dragon front bite_2
       rect:
         serializedVersion: 2
-        x: 1366
+        x: 1370
         y: 4
         width: 683
         height: 512
@@ -91,7 +91,7 @@ TextureImporter:
     - name: dragon front bite_3
       rect:
         serializedVersion: 2
-        x: 2049
+        x: 2055
         y: 4
         width: 683
         height: 512
@@ -101,7 +101,7 @@ TextureImporter:
     - name: dragon front bite_4
       rect:
         serializedVersion: 2
-        x: 2732
+        x: 2740
         y: 4
         width: 683
         height: 512
@@ -111,7 +111,7 @@ TextureImporter:
     - name: dragon front bite_5
       rect:
         serializedVersion: 2
-        x: 3415
+        x: 3425
         y: 4
         width: 683
         height: 512
@@ -121,7 +121,7 @@ TextureImporter:
     - name: dragon front bite_6
       rect:
         serializedVersion: 2
-        x: 4098
+        x: 4110
         y: 4
         width: 683
         height: 512
@@ -131,7 +131,7 @@ TextureImporter:
     - name: dragon front bite_7
       rect:
         serializedVersion: 2
-        x: 4781
+        x: 4795
         y: 4
         width: 683
         height: 512
@@ -141,7 +141,7 @@ TextureImporter:
     - name: dragon front bite_8
       rect:
         serializedVersion: 2
-        x: 5464
+        x: 5480
         y: 4
         width: 683
         height: 512

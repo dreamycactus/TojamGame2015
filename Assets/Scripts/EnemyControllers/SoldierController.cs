@@ -105,7 +105,7 @@ public class SoldierController : MonoBehaviour {
                     if (m_standShoot)
                     {
                         m_rb.velocity = new Vector2(0.0f, 0.0f);    //Stops soldier in place to shoot
-						m_rb.mass = 50;
+						m_rb.mass = 1000000;
                         m_animator.SetBool("Stand", true);
                     }
                     else

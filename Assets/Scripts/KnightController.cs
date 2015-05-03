@@ -21,8 +21,13 @@ class KnightController : MonoBehaviour {
 		LASER_MAX = 3;
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
+<<<<<<< HEAD
 	readonly float[] JUMP			= { 0.1f, 0.2f };
 	readonly float[] PUNCH			= { 0.5f, 0.5f, 0.5f };
+=======
+	readonly float[] JUMP			= { 0.15f, 0.2f };
+	readonly float[] PUNCH			= { 0.05f, 0.05f, 0.3f };
+>>>>>>> 3ba852530e286be62c870386ebcb94d490d22ed9
 	readonly float[] ROK_PUNCH		= { 0.05f, 0.05f, 0.3f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
 	readonly float HURT				= 0.2f;
@@ -38,11 +43,15 @@ class KnightController : MonoBehaviour {
 	bool movedUsed = false;
 	Rigidbody2D body;
 	float jumpPower;
+<<<<<<< HEAD
 	private GameObject m_Camera;
 	private float m_size;
 	private Vector3 m_camOffset;
 	private float m_camDepth = -10;
 	private Animator m_animator;
+=======
+	float extentX;
+>>>>>>> 3ba852530e286be62c870386ebcb94d490d22ed9
 
 	void Start() {
 		body = gameObject.GetComponent<Rigidbody2D>();
@@ -58,9 +67,11 @@ class KnightController : MonoBehaviour {
 	void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Floor" && state == State.INAIR) {
 			state = State.FREE;
+			body.drag = 3.0f;
 		}
 	}
 	void Update() {
+<<<<<<< HEAD
 		//keep up with camera
 		m_camOffset.x = transform.position.x;
 		m_Camera.transform.position = m_camOffset;
@@ -76,9 +87,20 @@ class KnightController : MonoBehaviour {
 					} else if (extent < -0.5f && transform.localScale.x < 0) {
 						FlipSprite();
 					}
+=======
+		extentX = Input.GetAxis("L_XAxis_1");
+	}
+	void FixedUpdate() {
+		switch(state) {
+			case State.FREE:
+				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED) {
+					body.AddForce(new Vector2(extentX * 20.0f, 0), ForceMode2D.Impulse);
+				}
+>>>>>>> 3ba852530e286be62c870386ebcb94d490d22ed9
 				if (Input.GetButtonDown("A_1")) {
 					StartMove();
 					state = State.INAIR;
+					body.drag = 0.1f;
 				} else if (Input.GetButtonDown("B_1")) {
 					StartMove();
 					state = State.LASERING;
@@ -138,12 +160,18 @@ class KnightController : MonoBehaviour {
 
 				break;
 			case State.INAIR:
-				if (Input.GetButtonUp("A_1") && moveTimer < JUMP[WINDUP]) {
-					jumpPower = moveTimer / JUMP[WINDUP];
+				extentX = Input.GetAxis("L_XAxis_1");
+				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED) {
+					body.AddForce(new Vector2(extentX * 20.0f, 0), ForceMode2D.Impulse);
+				}
+				if (Input.GetButtonUp("A_1") && moveTimer < JUMP[WINDUP] && !movedUsed) {
+					jumpPower = 10;
+					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
+					movedUsed = true;
 				}
 				if (moveTimer > JUMP[WINDUP] && !movedUsed) {
-					jumpPower = 1;
-					body.AddForce(new Vector2(0, 200 * jumpPower), ForceMode2D.Impulse);
+					jumpPower = 15;
+					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
 					movedUsed = true;
 				}
 				break;

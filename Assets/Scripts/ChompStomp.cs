@@ -39,7 +39,7 @@ public class ChompStomp : MonoBehaviour {
     {
         if (other.tag == "Enemy" || other.tag == "Player")
         {
-            other.GetComponent<Health>().TakeDamage(m_dmg);
+            other.GetComponent<Health>().TakeDamage(m_dmg, gameObject.GetComponent<Collider2D>());
             Destroy(this);
         }
 

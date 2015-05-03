@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour {
     public float m_riseDuration; //how long you are rising for
     public float m_riseSpeedX; // vertical rise speed
     public float m_riseSpeedY; // horizontal rise speed
+    public float m_hurtTimer; // long the hurt stun lasts
 
     public int m_Direction = 1; //direcitonal facing
     public Rigidbody2D m_rb;
@@ -74,7 +75,8 @@ public class PlayerController : MonoBehaviour {
         StompState = 7,
         BlockState = 8,
         DashState = 9,
-        RisingState = 10
+        RisingState = 10,
+        HurtState = 11
     }
     private Dictionary<CharacterStateNames, PlayerBase> m_gameStateDictionary = new Dictionary<CharacterStateNames, PlayerBase>();
     private PlayerBase m_currentGameState = null;
@@ -115,7 +117,7 @@ public class PlayerController : MonoBehaviour {
         m_chompDuration = 0.3f; //how long a chomp state is
         m_chompWaitTime = 0.2f; //how long you wait at the end of a chomp
         m_shootDuration = 0.4f; //how long a shoot animation state is
-        m_ShootDelayTime = 0.3f; //how long you wait before firing
+        m_ShootDelayTime = 0.2f; //how long you wait before firing
         m_bulletSpeed = 20.0f; //how fast the bullets fly
         m_stompPauseDuration = 0.1f; //how long you hang in the air before stomping
         m_stompForwardMagnitude = 5.0f; //the force multiplier forward motion on stomping;
@@ -128,6 +130,7 @@ public class PlayerController : MonoBehaviour {
         m_riseDuration = 0.5f; //how long you are rising for
         m_riseSpeedX = 15.0f; // vertical rise speed
         m_riseSpeedY = 15.0f; // horizontal rise speed
+        m_hurtTimer = 0.3f; // long the hurt stun lasts
 //////////////////////////////////////////////////////////////////////////
         m_camOffset = new Vector3(0, 1.5f, m_camDepth);
         m_rb.fixedAngle = true;
@@ -207,6 +210,7 @@ public class PlayerController : MonoBehaviour {
         m_gameStateDictionary.Add(CharacterStateNames.BlockState, new BlockState(this));
         m_gameStateDictionary.Add(CharacterStateNames.DashState, new DashState(this));
         m_gameStateDictionary.Add(CharacterStateNames.RisingState, new RisingState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.HurtState, new HurtState(this));
 
         //start the state machine
         ChangePlayerState(CharacterStateNames.IdleState); //starts in the idle
@@ -215,13 +219,20 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    void ApplyDamage(int dmg)
+    {
+        ChangePlayerState(CharacterStateNames.HurtState);
+    }
+
     //Change the game state (occurs on next frame)
     public void ChangePlayerState(CharacterStateNames nextState)
     {
         if (!m_gameStateDictionary.ContainsKey(nextState))
             return;
-
         m_animator.SetInteger(HashIDs.State, (int)nextState);
+        if (m_nextGameStateIndex == CharacterStateNames.HurtState)
+            return;
+
         m_nextGameStateIndex = nextState;
     }
 
@@ -570,7 +581,8 @@ public class ShootState : PlayerBase
     {
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_ShootTime -= Time.fixedDeltaTime;
-        
+        m_ShootDelayTime -= Time.fixedDeltaTime;
+
         if (m_ShootTime > 0)
         {
             //Get shot direction
@@ -583,10 +595,10 @@ public class ShootState : PlayerBase
                 m_shootDirection.y = 0.0f;
 
             //shoot bullet
-            if (!m_hasShot)
+            if (!m_hasShot && m_ShootDelayTime < 0)
             {
                 GameObject bullet = Object.Instantiate(Resources.Load("FireBall", typeof(GameObject))) as GameObject;
-                bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0.4f, 0);
+                bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0.6f, 0);
                 if (m_cont.m_Direction > 0 && m_shootDirection.y > 0)
                     bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 45));
                 if (m_cont.m_Direction > 0 && m_shootDirection.y < 0)
@@ -801,3 +813,40 @@ public class RisingState : PlayerBase
 }
 
 //while being hurt
+public class HurtState : PlayerBase
+{
+    private int m_direction = -1;
+    private float m_hurtTimer;
+    public HurtState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        m_direction = m_cont.m_Direction;
+        m_hurtTimer = m_cont.m_hurtTimer;
+    }
+    public override void UpdateState()
+    {
+        m_hurtTimer -= Time.fixedDeltaTime;
+        m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
+
+        if (m_hurtTimer > 0)
+        {
+            /// new code
+            float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_maxSpeed);
+            m_cont.m_rb.AddForce(new Vector2(-1f * m_cont.m_Direction * m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.5f* (-1f * m_cont.m_Direction * m_cont.m_movementMultiplier * l_accelerationMultiplier)));
+            ///
+        }
+
+        if (m_hurtTimer < 0)
+            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
+    }
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
+
+    }
+
+
+}

@@ -11,7 +11,7 @@ class KnightController : MonoBehaviour {
 		INAIR,
 		ROCKET_PUNCHING,
 		LASERING,
-		INAIR_LASERING,
+		INAIR_ROCKET,
 		HURT
 	}
 	const int WINDUP = 0,
@@ -20,18 +20,21 @@ class KnightController : MonoBehaviour {
 		LASER_MIN = 2,
 		LASER_MAX = 3,
 		OFFSETX = 3,
-		OFFSETY = 4;
+		OFFSETY = 4,
+		WIDTH = 4,
+		HEIGHT = 5;
 	enum Move {
 		PUNCH,
 		JUMP,
 		LASER,
+		ROCKET,
 		NONE
 	}
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
 	readonly float[] JUMP			= { 0.2f, 0.1f };
-	readonly float[] PUNCH			= { 0.1f, 0.5f, 0.5f, 0.5f, -0.2f };
-	readonly float[] ROK_PUNCH		= { 0.05f, 0.05f, 0.3f };
+	readonly float[] PUNCH			= { 0.01f, 0.5f, 0.5f, 0.5f, -0.2f };
+	readonly float[] ROK_PUNCH		= { 0.2f, 0.2f, 0.3f, 0.5f, -0.4f, 0.5f, 0.5f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
 	readonly float HURT				= 0.2f;
 
@@ -40,7 +43,6 @@ class KnightController : MonoBehaviour {
 	float moveTimer = 0;
 	bool lockedOnPlayer = false;
 	State state = State.FREE;
-	String bufferedAction;
 	bool isLeft = false;
 	float laserEnd = 0;
 	bool movedUsed = false;
@@ -93,7 +95,7 @@ class KnightController : MonoBehaviour {
 				state = State.INAIR;
 				StartMove();
 			} else if (Input.GetButtonDown("B_1")) {
-				queuedMove = Move.LASER;
+				queuedMove = Move.ROCKET;
 			} else if (Input.GetButtonDown("X_1")) {
 				queuedMove = Move.PUNCH;
 			}
@@ -132,6 +134,11 @@ class KnightController : MonoBehaviour {
 						state = State.PUNCHING;
 						queuedMove = Move.NONE;
 						break;
+					case Move.ROCKET:
+						StartMove();
+						state = State.ROCKET_PUNCHING;
+						queuedMove = Move.NONE;
+						break;
 					default:
 						break;
 				}
@@ -150,6 +157,7 @@ class KnightController : MonoBehaviour {
 					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * PUNCH[OFFSETX], PUNCH[OFFSETY]);
 					var hitbox = pHitbox.GetComponent<Hitbox>();
 					hitbox.l_shootingPlayer = col;
+					hitbox.ttl = -200;
 					movedUsed = true;
 					if (isLeft) {
 						m_animator.SetTrigger("PunchLeft");
@@ -167,11 +175,19 @@ class KnightController : MonoBehaviour {
 				break;
 			case State.ROCKET_PUNCHING:
 				if (moveTimer > ROK_PUNCH[WINDUP] && !movedUsed) {
-					// Spawn punch
+					pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
+					pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+					var col = pHitbox.GetComponent<BoxCollider2D>();
+					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
+					col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);
+					var hitbox = pHitbox.GetComponent<Hitbox>();
+					hitbox.l_shootingPlayer = col;
+					hitbox.ttl = 10;
+					pHitbox.GetComponent<Rigidbody2D>().velocity = new Vector2(-Math.Sign(transform.localScale.x)*20, 0) + body.velocity;
 					movedUsed = true;
 				}
 				if (moveTimer > ROK_PUNCH[MOVE_DURATION]) {
-					// Destroy punch
+
 				}
 				if (moveTimer > ROK_PUNCH[WINDDOWN]) {
 					state = State.FREE;
@@ -212,7 +228,7 @@ class KnightController : MonoBehaviour {
 					body.drag = 3.0f;
 				}
 				break;
-			case State.INAIR_LASERING:
+			case State.INAIR_ROCKET:
 				break;
 		}
 		moveTimer += Time.deltaTime;

@@ -42,7 +42,7 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(int p_dmg, Collider2D col)
     {
-		gameObject.SendMessage("ApplyDamage", p_dmg);
+		
         if(blocking)
         {
             Debug.Log("blocked");
@@ -59,6 +59,8 @@ public class Health : MonoBehaviour
                 {
                     cont.ChangePlayerState(PlayerController.CharacterStateNames.HurtState);
                 }
+                else
+                    gameObject.SendMessage("ApplyDamage", p_dmg);
             }
 
             if (m_currentHealth <= 0)

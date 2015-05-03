@@ -219,6 +219,11 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    void ApplyDamage(int dmg)
+    {
+        ChangePlayerState(CharacterStateNames.HurtState);
+    }
+
     //Change the game state (occurs on next frame)
     public void ChangePlayerState(CharacterStateNames nextState)
     {

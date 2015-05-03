@@ -381,14 +381,18 @@ public class JumpState : PlayerBase
 //Crouching state
 public class CrouchState : PlayerBase
 {
+    private BoxCollider2D m_col;
     public CrouchState(PlayerController p_cont)
     {
         m_cont = p_cont;
+        m_col = m_cont.GetComponent<BoxCollider2D>();
     }
     
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         Debug.Log("In Crouching State");
+        m_col.size = new Vector2(4.0f, 2.0f);
+        m_col.offset = new Vector2(0.0f, -1.2f);
     }
 
     public override void UpdateState()
@@ -411,6 +415,8 @@ public class CrouchState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
+        m_col.size = new Vector2(3.0f, 4.0f);
+        m_col.offset = new Vector2(0f, -0.2f);
     }
 }
 
@@ -420,9 +426,11 @@ public class ChompState : PlayerBase
     private float m_chompTime;
     private float m_waitTime;
     private PlayerController.CharacterStateNames m_lastState;
+    private BoxCollider2D m_col;
     public ChompState(PlayerController p_cont)
     {
         m_cont = p_cont;
+        m_col = m_cont.GetComponent<BoxCollider2D>();
     }
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
@@ -430,6 +438,10 @@ public class ChompState : PlayerBase
         m_chompTime = m_cont.m_chompDuration;
         m_waitTime = m_cont.m_chompWaitTime;
         m_lastState = p_prevState;
+        m_col.size = new Vector2(4.0f, 2.0f);
+        m_col.offset = new Vector2(0.0f, -1.2f);
+        
+
         Debug.Log("Chomp");
     }
 
@@ -460,7 +472,8 @@ public class ChompState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
+        m_col.size = new Vector2(3.0f, 4.0f);
+        m_col.offset = new Vector2(0f, -0.2f);
     }
 }
 

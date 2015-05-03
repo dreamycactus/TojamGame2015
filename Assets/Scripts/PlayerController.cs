@@ -105,8 +105,6 @@ public class PlayerController : MonoBehaviour {
         l_facing.x = m_Direction;
         transform.localScale = l_facing;
 
-        
-
         //keep up with camera
         m_camOffset.x = transform.position.x;
         m_Camera.transform.position = m_camOffset;
@@ -431,6 +429,8 @@ public class ChompState : PlayerBase
     private float m_waitTime;
     private PlayerController.CharacterStateNames m_lastState;
     private BoxCollider2D m_col;
+    private bool m_hasChomped = false;
+    private GameObject m_hitbox;
     public ChompState(PlayerController p_cont)
     {
         m_cont = p_cont;
@@ -444,7 +444,7 @@ public class ChompState : PlayerBase
         m_lastState = p_prevState;
         m_col.size = new Vector2(4.0f, 2.0f);
         m_col.offset = new Vector2(0.0f, -1.2f);
-        
+        m_hasChomped = false;
 
         Debug.Log("Chomp");
     }
@@ -460,6 +460,22 @@ public class ChompState : PlayerBase
             Vector2 temp = m_cont.m_rb.velocity;
             temp.x = m_cont.m_chomSpeed*m_cont.m_Direction;
             m_cont.m_rb.velocity = temp;
+
+            if (m_hasChomped == false)
+            {
+                m_hitbox = Object.Instantiate(Resources.Load("ChompBox", typeof(GameObject))) as GameObject;
+                
+                if (m_lastState == PlayerController.CharacterStateNames.CrouchState)
+                    m_hitbox.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 3.0f, -1, 0);
+                else
+                    m_hitbox.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.1f, 0, 0);
+
+                m_hitbox.GetComponent<ChompStomp>().l_shootingPlayer = m_cont.GetComponent<BoxCollider2D>();
+                m_hitbox.GetComponent<ChompStomp>().Init();
+                
+                m_hasChomped = true;
+            }
+
         }
         if(m_chompTime <= 0)
         {
@@ -478,6 +494,7 @@ public class ChompState : PlayerBase
     {
         m_col.size = new Vector2(3.0f, 4.0f);
         m_col.offset = new Vector2(0f, -0.2f);
+        Object.Destroy(m_hitbox);
     }
 }
 
@@ -544,8 +561,6 @@ public class ShootState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-        
-
     }
 
 }
@@ -554,7 +569,10 @@ public class StompState : PlayerBase
 {
     private float m_stompTime;
     private bool flag;
-
+    private GameObject m_hitbox;
+    private bool m_hasStomped;
+    private PlayerController.CharacterStateNames m_lastState;
+    
     public StompState(PlayerController p_cont)
     {
         m_cont = p_cont;
@@ -564,6 +582,8 @@ public class StompState : PlayerBase
     {
         m_stompTime = m_cont.m_stompPauseDuration;
         flag = false;
+        m_hasStomped = false;
+        m_lastState = p_prevState;
         Debug.Log("Stomping");
     }
 
@@ -575,6 +595,20 @@ public class StompState : PlayerBase
         {
             m_cont.m_rb.velocity = Vector2.zero;
         }
+        if (m_hasStomped == false)
+        {
+            m_hitbox = Object.Instantiate(Resources.Load("ChompBox", typeof(GameObject))) as GameObject;
+            m_hitbox.transform.position = m_cont.transform.position + new Vector3(0, -1, 0);
+            m_hitbox.GetComponent<ChompStomp>().l_shootingPlayer = m_cont.GetComponent<BoxCollider2D>();
+            m_hitbox.GetComponent<ChompStomp>().Init();
+
+            m_hasStomped = true;
+        }
+        if(m_hitbox != null)
+        {
+            m_hitbox.transform.position = m_cont.transform.position + new Vector3(0, -2, 0);
+        }
+
         if (m_stompTime < 0 && !flag)
         {
             m_cont.m_rb.velocity = new Vector2(0, m_cont.m_stompSpeed);
@@ -583,11 +617,16 @@ public class StompState : PlayerBase
 
 
         if (m_cont.m_grounded) //when hits the ground
+        {
+            GameObject buttSmoke = Object.Instantiate(Resources.Load("ButtSmoke", typeof(GameObject))) as GameObject;
+            buttSmoke.transform.position = m_cont.transform.position + new Vector3(0, -1.35f, 0);
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
+        }
+            
     }
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
+        Object.Destroy(m_hitbox);
     }
 }

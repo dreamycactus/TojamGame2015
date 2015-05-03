@@ -8,37 +8,51 @@ using System.Collections;
 public class AudioManager : MonoBehaviour {
 
 	#region Public Variables
+    
+    
+    public AudioSource soundPlayer;
+    public AudioSource musicPlayer;
+    public AudioClip[] clips;
+    public AudioClip[] musics;
     #endregion
 
     #region Protected Variables
     #endregion
 
     #region Private Variables
+    private static AudioManager m_instance;
     #endregion
 
     #region Accessors
+    public static AudioManager GetInstance()
+    {
+        if (m_instance == null)
+            m_instance = Managers.GetInstance().gameObject.AddComponent<AudioManager>();
+
+        return m_instance;
+    }
     #endregion
 
     #region Unity Defaults
-    
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    void Awake()
+    {
+        soundPlayer = new AudioSource();
+        musicPlayer = new AudioSource();
+    }
 
-    #endregion
+    public void PlayMusic(int tracknum)
+    {
+        musicPlayer.clip = musics[tracknum];
+        musicPlayer.Play();
+    }
 
-    #region Public Methods
-    #endregion
 
-    #region Protected Methods
-    #endregion
-
-    #region Private Methods
+    public void PlayClip(int clipnum)
+    {
+        
+        soundPlayer.clip = clips[clipnum];
+        soundPlayer.Play();
+    }
     #endregion
 }
+    

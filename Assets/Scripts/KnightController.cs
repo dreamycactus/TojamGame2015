@@ -228,7 +228,7 @@ class KnightController : MonoBehaviour {
 					if (Math.Sign(extentX) != -Math.Sign(transform.localScale.x) && Math.Abs(extentX) > 0.001 && jumpPower > 17) {
 						body.AddForce(new Vector2(20 * jumpPower * extentX, 14 * jumpPower), ForceMode2D.Impulse);
 					} else {
-						body.AddForce(new Vector2(10 * jumpPower * extentX, 20 * jumpPower), ForceMode2D.Impulse);
+						body.AddForce(new Vector2(5 * jumpPower * extentX, 20 * jumpPower), ForceMode2D.Impulse);
 					}
 					landed = false;
 					queuedMove = Move.NONE;

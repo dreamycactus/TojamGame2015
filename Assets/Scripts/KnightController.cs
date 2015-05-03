@@ -150,11 +150,13 @@ class KnightController : MonoBehaviour {
 					jumpPower = 10;
 					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
 					movedUsed = true;
+					m_animator.SetBool("Jumping", true);
 				}
 				if (moveTimer > JUMP[WINDUP] && !movedUsed) {
 					jumpPower = 15;
 					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
 					movedUsed = true;
+					m_animator.SetBool("Jumping", true);
 				}
 				break;
 			case State.INAIR_LASERING:

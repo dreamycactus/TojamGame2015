@@ -172,7 +172,7 @@ public class SoldierController : MonoBehaviour {
                 break;
 
             case SoldierState.Death:
-				GameObject exp = Instantiate(Resources.Load("Explosion")) as GameObject;
+				GameObject exp = ExplosionManager.Inst.GetExplosion();
 				exp.transform.position = transform.position;
 				Destroy(this.gameObject);
                 break;

@@ -14,6 +14,7 @@ public class Bullet : MonoBehaviour
 {
 	public float m_currentLife;
 	public int m_dmg = 1;
+	public bool m_explodeOnImpact = false;
 	public Bullet ()
 	{
 	}
@@ -42,10 +43,18 @@ public class Bullet : MonoBehaviour
         {
             other.GetComponent<Health>().TakeDamage(m_dmg);
             Free();
+			if (m_explodeOnImpact) {
+				GameObject exp = ExplosionManager.Inst.GetExplosion();
+				exp.transform.position = transform.position;
+			}
             Debug.Log("Player Hit");
         }
         else if (other.tag != "Enemy")
         {
+			if (m_explodeOnImpact) {
+				GameObject exp = ExplosionManager.Inst.GetExplosion();
+				exp.transform.position = transform.position;
+			}
             Free();
         }
         

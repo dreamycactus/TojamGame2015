@@ -41,7 +41,7 @@ public class Bullet : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            other.GetComponent<Health>().TakeDamage(m_dmg);
+            other.GetComponent<Health>().TakeDamage(m_dmg, gameObject.GetComponent<Collider2D>());
             Free();
 			if (m_explodeOnImpact) {
 				GameObject exp = ExplosionManager.Inst.GetExplosion();

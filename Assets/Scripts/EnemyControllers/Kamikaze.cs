@@ -117,7 +117,7 @@ public class Kamikaze : MonoBehaviour {
 	{
 		if (col.transform.tag == "Player")
 		{
-			col.gameObject.GetComponent<Health>().TakeDamage(m_explodeDamage);
+			col.gameObject.GetComponent<Health>().TakeDamage(m_explodeDamage, gameObject.GetComponent<Collider2D>());
 			
 			m_currentState = KamikazeState.Death;
 		}

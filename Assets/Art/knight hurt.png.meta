@@ -1,16 +1,16 @@
 fileFormatVersion: 2
-guid: c3e4c33701c0a394d94a201836305028
-timeCreated: 1430679391
-licenseType: Free
+guid: 2563442f0c88b7141b4a6cb4d2b6dd14
+timeCreated: 1430680364
+licenseType: Pro
 TextureImporter:
   fileIDToRecycleName:
-    21300000: dragon hurt_0
-    21300002: dragon hurt_1
-    21300004: dragon hurt_2
-    21300006: dragon hurt_3
-    21300008: dragon hurt_4
-    21300010: dragon hurt_5
-    21300012: dragon hurt_6
+    21300000: knight hurt_0
+    21300002: knight hurt_1
+    21300004: knight hurt_2
+    21300006: knight hurt_3
+    21300008: knight hurt_4
+    21300010: knight hurt_5
+    21300012: knight hurt_6
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -56,7 +56,7 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: dragon hurt_0
+    - name: knight hurt_0
       rect:
         serializedVersion: 2
         x: 0
@@ -66,7 +66,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_1
+    - name: knight hurt_1
       rect:
         serializedVersion: 2
         x: 512
@@ -76,7 +76,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_2
+    - name: knight hurt_2
       rect:
         serializedVersion: 2
         x: 1024
@@ -86,7 +86,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_3
+    - name: knight hurt_3
       rect:
         serializedVersion: 2
         x: 1536
@@ -96,7 +96,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_4
+    - name: knight hurt_4
       rect:
         serializedVersion: 2
         x: 2048
@@ -106,7 +106,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_5
+    - name: knight hurt_5
       rect:
         serializedVersion: 2
         x: 2560
@@ -116,7 +116,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_6
+    - name: knight hurt_6
       rect:
         serializedVersion: 2
         x: 3072

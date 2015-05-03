@@ -40,9 +40,9 @@ public class Health : MonoBehaviour
         set { m_maxHealth = value; }
     }
 
-    public void TakeDamage(int p_dmg)
+    public void TakeDamage(int p_dmg, Collider2D col)
     {
-		gameObject.SendMessage("ApplyDamage", p_dmg);
+		
         if(blocking)
         {
             Debug.Log("blocked");
@@ -51,6 +51,11 @@ public class Health : MonoBehaviour
         {
 			m_currentHealth -= p_dmg;
             Debug.Log(m_currentHealth);
+
+            if( col.tag == "Player")
+            {
+                 gameObject.SendMessage("ApplyDamage", p_dmg);
+            }
 
             if (m_currentHealth <= 0)
             {

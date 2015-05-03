@@ -449,7 +449,7 @@ public class JumpState : PlayerBase
 			AudioManager.GetInstance().PlayClip(16);
 		}
 
-		}
+}
 
 	public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {

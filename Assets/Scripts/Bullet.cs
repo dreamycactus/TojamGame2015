@@ -13,7 +13,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
 	public float m_currentLife;
-	private int m_dmg = 1;
+	public int m_dmg = 1;
 	public Bullet ()
 	{
 	}

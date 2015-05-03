@@ -34,6 +34,8 @@ public class SoldierController : MonoBehaviour {
 
     public bool m_standShoot = false;
 
+	public bool m_ignorePlayerCollision = true;
+
 	// Use this for initialization
 	void Start () {
         m_currentState = SoldierState.Idle;
@@ -45,8 +47,11 @@ public class SoldierController : MonoBehaviour {
         GameObject l_playerOne = Managers.GetInstance().GetPlayerManager().GetPlayerOne();
         GameObject l_playerTwo = Managers.GetInstance().GetPlayerManager().GetPlayerTwo();
 
-        Physics2D.IgnoreCollision(l_playerOne.GetComponent<Collider2D>(), GetComponent<Collider2D>());
-        Physics2D.IgnoreCollision(l_playerTwo.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+		if (m_ignorePlayerCollision)
+		{
+			Physics2D.IgnoreCollision(l_playerOne.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+			Physics2D.IgnoreCollision(l_playerTwo.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+		}
 
         m_animator = gameObject.GetComponent<Animator>();
 
@@ -98,6 +103,7 @@ public class SoldierController : MonoBehaviour {
                     if (m_standShoot)
                     {
                         m_rb.velocity = new Vector2(0.0f, 0.0f);    //Stops soldier in place to shoot
+						m_rb.mass = 50;
                         m_animator.SetBool("Stand", true);
                     }
                     else

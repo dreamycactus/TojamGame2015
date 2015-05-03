@@ -48,10 +48,10 @@ public class Health : MonoBehaviour
         }
         else 
         {
-            m_currentHealth -= p_dmg;
+			m_currentHealth -= p_dmg;
             Debug.Log(m_currentHealth);
 
-            if (m_currentHealth < 0)
+            if (m_currentHealth <= 0)
             {
                 gameObject.SendMessage("EnterDeathState");
             }

@@ -34,6 +34,7 @@ public class Health : MonoBehaviour
     public void TakeDamage(int p_dmg)
     {
         m_currentHealth -= p_dmg;
+		Debug.Log(m_currentHealth);
 
         if (m_currentHealth < 0)
         {

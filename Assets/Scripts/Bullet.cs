@@ -13,7 +13,7 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
 	public float m_currentLife;
-	public int m_dmg = 1;
+	private int m_dmg = 1;
 	public Bullet ()
 	{
 	}
@@ -40,7 +40,7 @@ public class Bullet : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            //other.GetComponent<Health>().TakeDamage(m_dmg);
+            other.GetComponent<Health>().TakeDamage(m_dmg);
             Free();
             Debug.Log("Player Hit");
         }

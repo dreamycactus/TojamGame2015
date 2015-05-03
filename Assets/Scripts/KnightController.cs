@@ -15,13 +15,13 @@ class KnightController : MonoBehaviour {
 		HURT
 	}
 	const int WINDUP = 0,
-		MOVE_DURATION = 3,
+		MOVE_DURATION = 2,
 		WINDDOWN = 1,
 		LASER_MIN = 2,
 		LASER_MAX = 3;
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
-	readonly float[] JUMP			= { 0.1f, 0.2f };
+	readonly float[] JUMP			= { 0.15f, 0.2f };
 	readonly float[] PUNCH			= { 0.05f, 0.05f, 0.3f };
 	readonly float[] ROK_PUNCH		= { 0.05f, 0.05f, 0.3f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
@@ -38,6 +38,7 @@ class KnightController : MonoBehaviour {
 	bool movedUsed = false;
 	Rigidbody2D body;
 	float jumpPower;
+	float extentX;
 
 	void Start() {
 		body = gameObject.GetComponent<Rigidbody2D>();
@@ -46,18 +47,22 @@ class KnightController : MonoBehaviour {
 	void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Floor" && state == State.INAIR) {
 			state = State.FREE;
+			body.drag = 3.0f;
 		}
 	}
 	void Update() {
-	}	
+		extentX = Input.GetAxis("L_XAxis_1");
+	}
 	void FixedUpdate() {
 		switch(state) {
 			case State.FREE:
-				var extent = Input.GetAxis("L_XAxis_1");
-					body.AddForce(new Vector2(extent*1000, 0));
+				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED) {
+					body.AddForce(new Vector2(extentX * 20.0f, 0), ForceMode2D.Impulse);
+				}
 				if (Input.GetButtonDown("A_1")) {
 					StartMove();
 					state = State.INAIR;
+					body.drag = 0.1f;
 				} else if (Input.GetButtonDown("B_1")) {
 					StartMove();
 					state = State.LASERING;
@@ -111,12 +116,18 @@ class KnightController : MonoBehaviour {
 
 				break;
 			case State.INAIR:
-				if (Input.GetButtonUp("A_1") && moveTimer < JUMP[WINDUP]) {
-					jumpPower = moveTimer / JUMP[WINDUP];
+				extentX = Input.GetAxis("L_XAxis_1");
+				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED) {
+					body.AddForce(new Vector2(extentX * 20.0f, 0), ForceMode2D.Impulse);
+				}
+				if (Input.GetButtonUp("A_1") && moveTimer < JUMP[WINDUP] && !movedUsed) {
+					jumpPower = 10;
+					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
+					movedUsed = true;
 				}
 				if (moveTimer > JUMP[WINDUP] && !movedUsed) {
-					jumpPower = 1;
-					body.AddForce(new Vector2(0, 200 * jumpPower), ForceMode2D.Impulse);
+					jumpPower = 15;
+					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
 					movedUsed = true;
 				}
 				break;

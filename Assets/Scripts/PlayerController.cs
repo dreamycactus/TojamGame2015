@@ -692,7 +692,7 @@ public class BlockState : PlayerBase
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         m_cont.GetComponent<Health>().Blocking = true;
-        m_blockTime -= m_cont.m_blockDuration;
+        m_blockTime = m_cont.m_blockDuration;
         Debug.Log("Blocking");
     }
 
@@ -799,3 +799,5 @@ public class RisingState : PlayerBase
     {
     }
 }
+
+//while being hurt

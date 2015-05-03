@@ -65,9 +65,15 @@ class KnightController : MonoBehaviour {
 		set { m_Camera = value; }
 	}
 	void OnCollisionEnter2D(Collision2D col) {
-		if (col.gameObject.tag == "Floor" && state == State.INAIR) {
-			landed = true;
-			moveTimer = 0;
+	}
+	void OnCollisionStay2D(Collision2D coll) {
+		if (state == State.INAIR) {
+			foreach (ContactPoint2D tact in coll.contacts) {
+				if (state == State.INAIR && tact.normal == Vector2.up && movedUsed) { 
+					landed = true;
+					moveTimer = 0;
+				}
+			}
 		}
 	}
 	void Update() {
@@ -178,7 +184,7 @@ class KnightController : MonoBehaviour {
 				body.drag = 0.1f;
 				if (queuedMove == Move.JUMP) {
 					if (Math.Sign(extentX) != -Math.Sign(transform.localScale.x) && jumpPower > 17) {
-						body.AddForce(new Vector2(20 * jumpPower * extentX, 17 * jumpPower), ForceMode2D.Impulse);
+						body.AddForce(new Vector2(20 * jumpPower * extentX, 14 * jumpPower), ForceMode2D.Impulse);
 					} else {
 						body.AddForce(new Vector2(10 * jumpPower * extentX, 20 * jumpPower), ForceMode2D.Impulse);
 					}

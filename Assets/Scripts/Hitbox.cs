@@ -20,14 +20,13 @@ class Hitbox : MonoBehaviour {
 			Destroy(gameObject);
 		}
 	}
-	void OnTriggerEnter2D(Collider2D other) {
-<<<<<<< HEAD
-		if (other.tag == "Enemy" || other.tag == "Player") {
-			other.GetComponent<Health>().TakeDamage(m_dmg, gameObject.GetComponent<Collider2D>());
-=======
-		if (other != l_shootingPlayer && other.tag == "Enemy" || other.tag == "Player") {
-			other.GetComponent<Health>().TakeDamage(m_dmg);
->>>>>>> 5b478b758c57ee42c1218d717a2b27baf0962c67
-		}
-	}
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Enemy" || other.tag == "Player")
+            other.GetComponent<Health>().TakeDamage(m_dmg, gameObject.GetComponent<Collider2D>());
+        if (other != l_shootingPlayer && other.tag == "Enemy" || other.tag == "Player")
+            other.GetComponent<Health>().TakeDamage(m_dmg, gameObject.GetComponent<Collider2D>());
+
+    }
+	    
 }

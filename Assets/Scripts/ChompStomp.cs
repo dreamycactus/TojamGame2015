@@ -7,7 +7,7 @@ using System.Collections;
 public class ChompStomp : MonoBehaviour {
 
     #region Public Variables
-    public int m_dmg = 1;
+    public int m_dmg = 4;
     public Collider2D l_shootingPlayer;
 
     #endregion

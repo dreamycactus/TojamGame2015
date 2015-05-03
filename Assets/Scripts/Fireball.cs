@@ -8,7 +8,7 @@ public class Fireball : MonoBehaviour {
 
 	#region Public Variables
     public float m_currentLife = 3.0f;
-	private int m_dmg = 1;
+	private int m_dmg = 3;
     public Collider2D l_shootingPlayer;
 
     #endregion

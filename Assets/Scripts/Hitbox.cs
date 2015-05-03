@@ -21,7 +21,7 @@ class Hitbox : MonoBehaviour {
 		}
 	}
 	void OnTriggerEnter2D(Collider2D other) {
-		if (other.tag == "Enemy" || other.tag == "Player") {
+		if (other != l_shootingPlayer && other.tag == "Enemy" || other.tag == "Player") {
 			other.GetComponent<Health>().TakeDamage(m_dmg);
 		}
 	}

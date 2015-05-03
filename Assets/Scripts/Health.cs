@@ -42,6 +42,7 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(int p_dmg)
     {
+		gameObject.SendMessage("ApplyDamage", p_dmg);
         if(blocking)
         {
             Debug.Log("blocked");

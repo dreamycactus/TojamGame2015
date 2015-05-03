@@ -34,6 +34,8 @@ public class SoldierController : MonoBehaviour {
 
     public bool m_standShoot = false;
 
+	public bool m_isTank = false;
+
 	public bool m_ignorePlayerCollision = true;
 
 	// Use this for initialization
@@ -140,12 +142,25 @@ public class SoldierController : MonoBehaviour {
                     ApplyMovement(true);
                 }
 
+				if (m_isTank)
 				if (transform.position.x - m_target.transform.position.x > 0 && transform.localScale.x < 0)
 				{
+					if (m_isTank)
+					{
+						m_bulletEmitter.Patterns[0] = "parabola:1:-45";
+						m_bulletEmitter.Refresh();
+					}	
+
 					FlipSprite();
 				}
 				else if (transform.position.x - m_target.transform.position.x < 0 && transform.localScale.x > 0)
 				{
+					if (m_isTank)
+					{
+						m_bulletEmitter.Patterns[0] = "parabola:1:45";
+						m_bulletEmitter.Refresh();
+					}
+
 					FlipSprite();
 				}
 
@@ -201,4 +216,9 @@ public class SoldierController : MonoBehaviour {
 	{
 		transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
 	}
+
+	void OnCollisionEnter2D(Collision2D other)
+    {
+        m_rb.velocity = new Vector2(0 , m_rb.velocity.y);
+    }
 }

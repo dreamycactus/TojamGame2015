@@ -45,7 +45,8 @@ public class BulletParabolaPattern : BulletPattern
 					bullet = BulletManager.Inst.GetBullet();
 				}
 				bullet.transform.position = new Vector3(spawn.x, spawn.y, 0.0f);
-				bullet.GetComponent<Rigidbody2D>().velocity = Quaternion.AngleAxis(AngleOffset, Vector3.forward) * (Vector2)(Vector3.Normalize(target - spawn) * Speed);
+				bullet.GetComponent<Rigidbody2D>().gravityScale = 1;
+				bullet.GetComponent<Rigidbody2D>().velocity = Quaternion.AngleAxis(AngleOffset, Vector3.forward) * (Vector2)(Vector3.Normalize(target - spawn) * Speed * 1.3f);
 				bullet.GetComponent<Bullet>().m_currentLife = 5.0f;
 			}
 			smallCooldown -= Time.deltaTime;

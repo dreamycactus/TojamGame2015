@@ -33,10 +33,12 @@ public class BulletEmitter : MonoBehaviour
 		bPatterns = new List<BulletPattern>();
 		foreach (var p in Patterns) {
 			var args = p.Split(':');
+			int count = 1;
+			float angle = 0;
 			switch (args[0]) {
 				case "line":
-					int count = 1;
-					float angle = 0;
+					count = 1;
+					angle = 0;
 					if (args.Length > 1) {
 						count = Convert.ToInt32(args[1]);
 					}
@@ -53,6 +55,24 @@ public class BulletEmitter : MonoBehaviour
 					}
 					break;
 				case "sine":
+					break;
+				case "parabola":
+					count = 1;
+					angle = 0;
+					if (args.Length > 1) {
+						count = Convert.ToInt32(args[1]);
+					}
+					if (args.Length > 2) {
+						angle = float.Parse(args[2]);
+					}
+					if (m_customBulletType != null)
+					{
+						bPatterns.Add(new BulletParabolaPattern(this, count, angle, Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED, m_customBulletType));
+					}
+					else
+					{
+						bPatterns.Add(new BulletParabolaPattern(this, count, angle, Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED));
+					}
 					break;
 				default:
 					break;

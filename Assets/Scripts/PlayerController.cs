@@ -19,8 +19,11 @@ public class PlayerController : MonoBehaviour {
     public float m_chompDuration = 0.5f;
     public float m_chompWaitTime = 0.2f;
     public float m_shootDuration = 0.4f;
+    public float m_ShootDelayTime = 0.3f;
+    public float m_bulletSpeed = 20.0f;
     public float m_stompPauseDuration = 0.1f;
     public float m_stompSpeed = 25.0f;
+    
 
     public int m_Direction = 1;
     public Rigidbody2D m_rb;
@@ -381,14 +384,18 @@ public class JumpState : PlayerBase
 //Crouching state
 public class CrouchState : PlayerBase
 {
+    private BoxCollider2D m_col;
     public CrouchState(PlayerController p_cont)
     {
         m_cont = p_cont;
+        m_col = m_cont.GetComponent<BoxCollider2D>();
     }
     
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         Debug.Log("In Crouching State");
+        m_col.size = new Vector2(4.0f, 2.0f);
+        m_col.offset = new Vector2(0.0f, -1.2f);
     }
 
     public override void UpdateState()
@@ -411,6 +418,8 @@ public class CrouchState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
+        m_col.size = new Vector2(3.0f, 4.0f);
+        m_col.offset = new Vector2(0f, -0.2f);
     }
 }
 
@@ -420,9 +429,11 @@ public class ChompState : PlayerBase
     private float m_chompTime;
     private float m_waitTime;
     private PlayerController.CharacterStateNames m_lastState;
+    private BoxCollider2D m_col;
     public ChompState(PlayerController p_cont)
     {
         m_cont = p_cont;
+        m_col = m_cont.GetComponent<BoxCollider2D>();
     }
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
@@ -430,6 +441,10 @@ public class ChompState : PlayerBase
         m_chompTime = m_cont.m_chompDuration;
         m_waitTime = m_cont.m_chompWaitTime;
         m_lastState = p_prevState;
+        m_col.size = new Vector2(4.0f, 2.0f);
+        m_col.offset = new Vector2(0.0f, -1.2f);
+        
+
         Debug.Log("Chomp");
     }
 
@@ -460,7 +475,8 @@ public class ChompState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-
+        m_col.size = new Vector2(3.0f, 4.0f);
+        m_col.offset = new Vector2(0f, -0.2f);
     }
 }
 
@@ -468,7 +484,10 @@ public class ChompState : PlayerBase
 public class ShootState : PlayerBase
 {
     private float m_ShootTime;
+    private float m_ShootDelayTime;
     private PlayerController.CharacterStateNames m_laststate;
+    private bool m_hasShot;
+    private Vector2 m_shootDirection;
     public ShootState(PlayerController p_cont)
     {
         m_cont = p_cont;
@@ -478,16 +497,40 @@ public class ShootState : PlayerBase
     {
         Debug.Log("Shooting a fireball");
         m_ShootTime = m_cont.m_shootDuration;
+        m_ShootDelayTime = m_cont.m_ShootDelayTime;
         m_laststate = p_prevState;
+        m_hasShot = false;
+        m_shootDirection = new Vector2(m_cont.m_Direction, 0.0f);
     }
 
     public override void UpdateState()
     {
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_ShootTime -= Time.fixedDeltaTime;
+        
         if (m_ShootTime > 0)
         {
-            //SHOOTING DIRECTIONAL CODE GOES HERE
+            //Get shot direction
+            
+            if(m_cont.m_upKey)
+                m_shootDirection.y = 1.0f;
+            else if (m_cont.m_downKey && !m_cont.m_grounded)
+                m_shootDirection.y = -1.0f;
+            else
+                m_shootDirection.y = 0.0f;
+
+            //shoot bullet
+            if (!m_hasShot)
+            {
+                GameObject bullet = Object.Instantiate(Resources.Load("FireBall", typeof(GameObject))) as GameObject;
+                bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0, 0);
+                bullet.GetComponent<Fireball>().l_shootingPlayer = m_cont.GetComponent<BoxCollider2D>();
+                bullet.GetComponent<Fireball>().Init();
+                bullet.GetComponent<Rigidbody2D>().velocity = m_shootDirection*m_cont.m_bulletSpeed;
+                m_hasShot = true;
+            }
+
+
         }
 
 

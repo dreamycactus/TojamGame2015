@@ -29,6 +29,7 @@ class KnightController : MonoBehaviour {
 		JUMP,
 		LASER,
 		ROCKET,
+		ROCKET_AIR,
 		NONE
 	}
 
@@ -47,6 +48,7 @@ class KnightController : MonoBehaviour {
 	bool isLeft = false;
 	float laserEnd = 0;
 	bool movedUsed = false;
+	bool movedUsed2 = false;
 	bool landed = true;
 	Rigidbody2D body;
 	float jumpPower;
@@ -57,6 +59,7 @@ class KnightController : MonoBehaviour {
 	private Animator m_animator;
 	float extentX;
 	Move queuedMove;
+	float moveTimer2;
 
 	GameObject pHitbox;
 
@@ -72,12 +75,15 @@ class KnightController : MonoBehaviour {
 		set { m_Camera = value; }
 	}
 	void OnCollisionEnter2D(Collision2D col) {
-		if (state == State.INAIR) {
+		if (state == State.INAIR || (state == State.HURT && !landed)) {
 			foreach (ContactPoint2D tact in col.contacts) {
-				if (state == State.INAIR && tact.normal == Vector2.up && movedUsed) {
+				if (state == State.INAIR && tact.normal == Vector2.up && (movedUsed || state == State.HURT || movedUsed2)) {
 					m_animator.SetBool("Jumping", false);
 					landed = true;
-					moveTimer = 0;
+					body.gravityScale = 15;
+					if (state != State.HURT) {
+						moveTimer = 0;
+					}
 				}
 			}
 		}
@@ -101,14 +107,19 @@ class KnightController : MonoBehaviour {
 				queuedMove = Move.PUNCH;
 			}
 		}
-		if (state == State.INAIR && !movedUsed) {
-			if (Input.GetButtonUp("A_1")) {
-				queuedMove = Move.JUMP;
-				jumpPower = 16;
+		if (state == State.INAIR) {
+			if (!movedUsed) {
+				if (Input.GetButtonUp("A_1")) {
+					queuedMove = Move.JUMP;
+					jumpPower = 16;
+				}
+				if (moveTimer > JUMP[0]) {
+					queuedMove = Move.JUMP;
+					jumpPower = 20;
+				}
 			}
-			if (moveTimer > JUMP[0]) {
-				queuedMove = Move.JUMP;
-				jumpPower = 20;
+			if (Input.GetButtonDown("B_1") && !movedUsed2) {
+				queuedMove = Move.ROCKET_AIR;
 			}
 		}
 	}
@@ -159,7 +170,7 @@ class KnightController : MonoBehaviour {
 					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * PUNCH[OFFSETX], PUNCH[OFFSETY]);
 					var hitbox = pHitbox.GetComponent<Hitbox>();
 					hitbox.l_shootingPlayer = col;
-					hitbox.ttl = -200;
+					hitbox.ttl = PUNCH[MOVE_DURATION];
 					movedUsed = true;
 					if (isLeft) {
 						m_animator.SetTrigger("PunchLeft");
@@ -171,7 +182,7 @@ class KnightController : MonoBehaviour {
 				if (moveTimer > PUNCH[MOVE_DURATION]) {
 					Destroy(pHitbox);
 				}
-				if (moveTimer > PUNCH[WINDDOWN]) {
+				if (moveTimer > PUNCH[WINDDOWN]+ PUNCH[MOVE_DURATION]+ PUNCH[WINDUP]) {
 					state = State.FREE;
 				}
 				break;
@@ -214,7 +225,7 @@ class KnightController : MonoBehaviour {
 			case State.INAIR:
 				body.drag = 0.1f;
 				if (queuedMove == Move.JUMP) {
-					if (Math.Sign(extentX) != -Math.Sign(transform.localScale.x) && jumpPower > 17) {
+					if (Math.Sign(extentX) != -Math.Sign(transform.localScale.x) && Math.Abs(extentX) > 0.001 && jumpPower > 17) {
 						body.AddForce(new Vector2(20 * jumpPower * extentX, 14 * jumpPower), ForceMode2D.Impulse);
 					} else {
 						body.AddForce(new Vector2(10 * jumpPower * extentX, 20 * jumpPower), ForceMode2D.Impulse);
@@ -222,9 +233,31 @@ class KnightController : MonoBehaviour {
 					landed = false;
 					queuedMove = Move.NONE;
 					movedUsed = true;
+					movedUsed2 = false;
 					m_animator.SetBool("Jumping", true);
 				}
-				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED && !landed && movedUsed) {
+				if (queuedMove == Move.ROCKET_AIR) {
+					if (!movedUsed2) { 
+						pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
+						pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+						var col = pHitbox.GetComponent<BoxCollider2D>();
+						col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
+						col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);
+						var hitbox = pHitbox.GetComponent<Hitbox>();
+						hitbox.l_shootingPlayer = col;
+						hitbox.ttl = 10;
+						pHitbox.GetComponent<Rigidbody2D>().velocity = new Vector2(-Math.Sign(transform.localScale.x) * 20 + body.velocity.x, -10);
+						movedUsed2 = true;
+						queuedMove = Move.NONE;
+						body.velocity = new Vector2(0, 0);
+						body.gravityScale = 1;
+						moveTimer2 = 0;
+					}
+				}
+				if (moveTimer2 > ROK_PUNCH[WINDUP] + ROK_PUNCH[MOVE_DURATION]) {
+					body.gravityScale = 15;
+				}
+				if (movedUsed2 && body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED && !landed && movedUsed) {
 					body.AddForce(new Vector2(extentX * 15.0f, 0), ForceMode2D.Impulse);
 				}
 				if (landed && movedUsed && moveTimer > JUMP[WINDDOWN]) {
@@ -236,6 +269,7 @@ class KnightController : MonoBehaviour {
 				break;
 		}
 		moveTimer += Time.deltaTime;
+		moveTimer2 += Time.deltaTime;
 	}
 
 	void StartMove() {
@@ -243,6 +277,11 @@ class KnightController : MonoBehaviour {
 		movedUsed = false;
 		laserEnd = 0;
 		jumpPower = 0;
+	}
+
+	void ApplyDamage(int dmg) {
+		state = State.HURT;
+		moveTimer = 0;
 	}
 
 	private void FlipSprite() {

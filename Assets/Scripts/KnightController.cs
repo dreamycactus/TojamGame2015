@@ -12,7 +12,8 @@ class KnightController : MonoBehaviour {
 		ROCKET_PUNCHING,
 		LASERING,
 		INAIR_ROCKET,
-		HURT
+		HURT,
+		BLOCK
 	}
 	const int WINDUP = 0,
 		MOVE_DURATION = 2,
@@ -36,7 +37,7 @@ class KnightController : MonoBehaviour {
 	readonly float[] PUNCH			= { 0.01f, 0.5f, 0.5f, 0.5f, -0.2f };
 	readonly float[] ROK_PUNCH		= { 0.2f, 0.2f, 0.3f, 0.5f, -0.4f, 0.5f, 0.5f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
-	readonly float HURT				= 0.2f;
+	readonly float HURT				= 0.3f;
 
 	bool isInAir = false;
 	bool inputLocked = false;

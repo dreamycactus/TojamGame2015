@@ -116,7 +116,7 @@ public class PlayerController : MonoBehaviour {
         m_jumpMagnitude = 5000f; ; //jump force multiplier
         m_jumpSpeed = 17.0f; //how fast you jump up
         m_jumpDuration = 0.3f; //how long you're jumping for
-        m_chomSpeed = 10.0f; //how fast you move while chomping
+        m_chomSpeed = 40.0f; //how fast you move while chomping
         m_chompDuration = 0.3f; //how long a chomp state is
         m_chompWaitTime = 0.2f; //how long you wait at the end of a chomp
         m_shootDuration = 0.4f; //how long a shoot animation state is

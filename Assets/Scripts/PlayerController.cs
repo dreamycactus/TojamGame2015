@@ -11,9 +11,10 @@ public class PlayerController : MonoBehaviour {
 	#region Public Variables
    
 
-    public float m_movementMultiplier; //movement speed multiplier
+    public float m_movementMultiplier; //movement force multiplier
     public float m_maxSpeed; //a speed cap for horizontal movement
-    public float m_jumpSpeed; //how fast you jump up
+    public float m_jumpMagnitude; //jump force multiplier
+    public float m_jumpSpeed; //jump speed cap
     public float m_jumpDuration; //how long you're jumping for
     public float m_chomSpeed; //how fast you move while chomping
     public float m_chompDuration; //how long a chomp state is
@@ -104,12 +105,13 @@ public class PlayerController : MonoBehaviour {
 	void Start () 
     {
 //////////////////////////////////////////////////////////////////////////
-        m_movementMultiplier = 100000.0f; //movement speed multiplier
-        m_maxSpeed = 7.0f; //a speed cap for horizontal movement
+        m_movementMultiplier = 1000.0f; //movement speed multiplier
+        m_maxSpeed = 10.0f; //a speed cap for horizontal movement
+        m_jumpMagnitude = 5000f; ; //jump force multiplier
         m_jumpSpeed = 15.0f; //how fast you jump up
         m_jumpDuration = 0.3f; //how long you're jumping for
         m_chomSpeed = 10.0f; //how fast you move while chomping
-        m_chompDuration = 0.5f; //how long a chomp state is
+        m_chompDuration = 0.3f; //how long a chomp state is
         m_chompWaitTime = 0.2f; //how long you wait at the end of a chomp
         m_shootDuration = 0.4f; //how long a shoot animation state is
         m_ShootDelayTime = 0.3f; //how long you wait before firing
@@ -395,11 +397,15 @@ public class JumpState : PlayerBase
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_jumpTime -= Time.fixedDeltaTime;
 
+        /// new code
+        float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_jumpSpeed);
+        ///
         if(m_jumpTime > 0)
         {
-            Vector2 temp = m_cont.m_rb.velocity;
-            temp.y = m_cont.m_jumpSpeed;
-            m_cont.m_rb.velocity = temp;
+            m_cont.m_rb.AddForce(new Vector2(0.0f, m_cont.m_jumpMagnitude * l_accelerationMultiplier));
+            //Vector2 temp = m_cont.m_rb.velocity;
+            //temp.y = m_cont.m_jumpSpeed;
+            //m_cont.m_rb.velocity = temp;
         }
         if (m_cont.m_shootKey)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
@@ -493,9 +499,13 @@ public class ChompState : PlayerBase
         
         if (m_chompTime > 0)
         {
-            Vector2 temp = m_cont.m_rb.velocity;
-            temp.x = m_cont.m_chomSpeed*m_cont.m_Direction;
-            m_cont.m_rb.velocity = temp;
+            /// new code
+            float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_chomSpeed);
+            m_cont.m_rb.AddForce(new Vector2(m_cont.m_Direction*m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.0f));
+            ///
+            //Vector2 temp = m_cont.m_rb.velocity;
+            //temp.x = m_cont.m_chomSpeed*m_cont.m_Direction;
+            //m_cont.m_rb.velocity = temp;
 
             if (m_hasChomped == false)
             {
@@ -575,6 +585,15 @@ public class ShootState : PlayerBase
             {
                 GameObject bullet = Object.Instantiate(Resources.Load("FireBall", typeof(GameObject))) as GameObject;
                 bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0, 0);
+                if (m_cont.m_Direction > 0 && m_shootDirection.y > 0)
+                    bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 45));
+                if (m_cont.m_Direction > 0 && m_shootDirection.y < 0)
+                    bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -45));
+                if (m_cont.m_Direction < 0 && m_shootDirection.y > 0)
+                    bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, -45));
+                if (m_cont.m_Direction < 0 && m_shootDirection.y < 0)
+                    bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 45));
+
                 bullet.GetComponent<Fireball>().l_shootingPlayer = m_cont.GetComponent<BoxCollider2D>();
                 bullet.GetComponent<Fireball>().Init();
                 bullet.GetComponent<Rigidbody2D>().velocity = m_shootDirection*m_cont.m_bulletSpeed;
@@ -718,9 +737,13 @@ public class DashState : PlayerBase
 
         if (m_dashTime > 0)
         {
-            Vector2 temp = m_cont.m_rb.velocity;
-            temp.x = m_cont.m_dashSpeed * m_direction;
-            m_cont.m_rb.velocity = temp;
+            /// new code
+            float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_dashSpeed);
+            m_cont.m_rb.AddForce(new Vector2(m_direction*m_cont.m_movementMultiplier * l_accelerationMultiplier*3f, 0.0f));
+            ///
+            //Vector2 temp = m_cont.m_rb.velocity;
+            //temp.x = m_cont.m_dashSpeed * m_direction;
+            //m_cont.m_rb.velocity = temp;
         }
 
         if (m_dashTime <= 0)

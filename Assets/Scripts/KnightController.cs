@@ -18,7 +18,9 @@ class KnightController : MonoBehaviour {
 		MOVE_DURATION = 2,
 		WINDDOWN = 1,
 		LASER_MIN = 2,
-		LASER_MAX = 3;
+		LASER_MAX = 3,
+		OFFSETX = 3,
+		OFFSETY = 4;
 	enum Move {
 		PUNCH,
 		JUMP,
@@ -28,7 +30,7 @@ class KnightController : MonoBehaviour {
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
 	readonly float[] JUMP			= { 0.2f, 0.1f };
-	readonly float[] PUNCH			= { 0.1f, 0.5f, 0.5f };
+	readonly float[] PUNCH			= { 0.1f, 0.5f, 0.5f, 0.5f, -0.2f };
 	readonly float[] ROK_PUNCH		= { 0.05f, 0.05f, 0.3f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
 	readonly float HURT				= 0.2f;
@@ -52,6 +54,8 @@ class KnightController : MonoBehaviour {
 	private Animator m_animator;
 	float extentX;
 	Move queuedMove;
+
+	GameObject pHitbox;
 
 	void Start() {
 		body = gameObject.GetComponent<Rigidbody2D>();
@@ -115,7 +119,6 @@ class KnightController : MonoBehaviour {
 				}
 				switch(queuedMove) {
 					case Move.JUMP:
-						
 						break;
 					case Move.LASER:
 						StartMove();
@@ -139,6 +142,12 @@ class KnightController : MonoBehaviour {
 			case State.PUNCHING:
 				if (moveTimer > PUNCH[WINDUP] && !movedUsed) {
 					// Spawn punch
+					pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
+					pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+					var col = pHitbox.GetComponent<BoxCollider2D>();
+					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * PUNCH[OFFSETX], PUNCH[OFFSETY]);
+					var hitbox = pHitbox.GetComponent<Hitbox>();
+					hitbox.l_shootingPlayer = col;
 					movedUsed = true;
 					if (isLeft) {
 						m_animator.SetTrigger("PunchLeft");
@@ -148,7 +157,7 @@ class KnightController : MonoBehaviour {
 					isLeft = !isLeft;
 				}
 				if (moveTimer > PUNCH[MOVE_DURATION]) {
-					// Destroy punch
+					Destroy(pHitbox);
 				}
 				if (moveTimer > PUNCH[WINDDOWN]) {
 					state = State.FREE;

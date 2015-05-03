@@ -191,6 +191,9 @@ class KnightController : MonoBehaviour {
 					pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
 					pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 					pHitbox.GetComponent<SpriteRenderer>().enabled = true;
+					if (transform.localScale.x < 0) {
+						pHitbox.transform.localScale = new Vector3(-1 * pHitbox.transform.localScale.x, pHitbox.transform.localScale.y, pHitbox.transform.localScale.z);
+					}
 					var col = pHitbox.GetComponent<BoxCollider2D>();
 					col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
 					col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);
@@ -240,6 +243,9 @@ class KnightController : MonoBehaviour {
 					if (!movedUsed2) { 
 						pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
 						pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+						if (transform.localScale.x < 0) {
+							pHitbox.transform.localScale = new Vector3(-1 * pHitbox.transform.localScale.x, pHitbox.transform.localScale.y, pHitbox.transform.localScale.z);
+						}
 						var col = pHitbox.GetComponent<BoxCollider2D>();
 						col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
 						col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);
@@ -252,6 +258,7 @@ class KnightController : MonoBehaviour {
 						body.velocity = new Vector2(0, 0);
 						body.gravityScale = 1;
 						moveTimer2 = 0;
+						m_animator.SetTrigger("Shoot");
 					}
 				}
 				if (moveTimer2 > ROK_PUNCH[WINDUP] + ROK_PUNCH[MOVE_DURATION]) {
@@ -280,6 +287,7 @@ class KnightController : MonoBehaviour {
 	}
 
 	void ApplyDamage(int dmg) {
+		m_animator.SetTrigger("Hurt");
 		state = State.HURT;
 		moveTimer = 0;
 	}

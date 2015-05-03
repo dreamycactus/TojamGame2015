@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
-[System.Serializable]
-class BulletLinePattern : BulletPattern {
+public class BulletParabolaPattern : BulletPattern
+{
 	public float Period;
 	private float m_cooldown;
 	private float smallCooldown = Constants.NORMAL_BULLET_SMALL_PERIOD;
@@ -14,20 +11,23 @@ class BulletLinePattern : BulletPattern {
 	public float Speed;
 	public float AngleOffset = 0.0f;
 	private GameObject customBulletType;
-	public BulletLinePattern(BulletEmitter em, int burstCount, float angle, float period, float speed, GameObject bulletType) {
+
+	public BulletParabolaPattern(BulletEmitter em, int burstCount, float angle, float period, float speed, GameObject bulletType) {
 		Period = period;
 		Speed = speed;
 		this.burstCount = burstCount;
 		AngleOffset = angle;
 		customBulletType = bulletType;
 	}
-	public BulletLinePattern(BulletEmitter em, int burstCount, float angle, float period, float speed)
+
+	public BulletParabolaPattern(BulletEmitter em, int burstCount, float angle, float period, float speed)
 	{
 		Period = period;
 		Speed = speed;
 		this.burstCount = burstCount;
 		AngleOffset = angle;
 	}
+
 	override public void Step(Vector2 spawn, Vector2 target) {
 		if (burstIndex >= burstCount) {
 			m_cooldown -= Time.deltaTime;

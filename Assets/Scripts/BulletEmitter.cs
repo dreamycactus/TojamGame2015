@@ -18,6 +18,8 @@ public class BulletEmitter : MonoBehaviour
 	public List<String> Patterns;
     public bool m_autoFire = false;
 
+	public GameObject m_customBulletType;
+
 	public Vector2 Target;
 	public BulletEmitter ()
 	{
@@ -41,7 +43,14 @@ public class BulletEmitter : MonoBehaviour
 					if (args.Length > 2) {
 						angle = float.Parse(args[2]);
 					}
-					bPatterns.Add(new BulletLinePattern(this, count, angle, Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED));
+					if (m_customBulletType != null)
+					{
+						bPatterns.Add(new BulletLinePattern(this, count, angle, Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED, m_customBulletType));
+					}
+					else
+					{
+						bPatterns.Add(new BulletLinePattern(this, count, angle, Constants.NORMAL_BULLET_PERIOD, Constants.NORMAL_BULLET_SPEED));
+					}
 					break;
 				case "sine":
 					break;

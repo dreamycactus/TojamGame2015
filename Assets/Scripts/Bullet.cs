@@ -40,7 +40,7 @@ public class Bullet : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            //other.GetComponent<Health>().TakeDamage(m_dmg);
+            other.GetComponent<Health>().TakeDamage(m_dmg);
             Free();
             Debug.Log("Player Hit");
         }

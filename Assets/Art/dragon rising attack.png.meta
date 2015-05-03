@@ -1,16 +1,20 @@
 fileFormatVersion: 2
-guid: c3e4c33701c0a394d94a201836305028
-timeCreated: 1430679391
+guid: df37d90bfc4455d40941e415b66c1168
+timeCreated: 1430680865
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
-    21300000: dragon hurt_0
-    21300002: dragon hurt_1
-    21300004: dragon hurt_2
-    21300006: dragon hurt_3
-    21300008: dragon hurt_4
-    21300010: dragon hurt_5
-    21300012: dragon hurt_6
+    21300000: dragon rising attack_0
+    21300002: dragon rising attack_1
+    21300004: dragon rising attack_2
+    21300006: dragon rising attack_3
+    21300008: dragon rising attack_4
+    21300010: dragon rising attack_5
+    21300012: dragon rising attack_6
+    21300014: dragon rising attack_7
+    21300016: dragon rising attack_8
+    21300018: dragon rising attack_9
+    21300020: dragon rising attack_10
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -56,7 +60,7 @@ TextureImporter:
   buildTargetSettings: []
   spriteSheet:
     sprites:
-    - name: dragon hurt_0
+    - name: dragon rising attack_0
       rect:
         serializedVersion: 2
         x: 0
@@ -66,7 +70,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_1
+    - name: dragon rising attack_1
       rect:
         serializedVersion: 2
         x: 512
@@ -76,7 +80,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_2
+    - name: dragon rising attack_2
       rect:
         serializedVersion: 2
         x: 1024
@@ -86,7 +90,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_3
+    - name: dragon rising attack_3
       rect:
         serializedVersion: 2
         x: 1536
@@ -96,7 +100,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_4
+    - name: dragon rising attack_4
       rect:
         serializedVersion: 2
         x: 2048
@@ -106,7 +110,7 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_5
+    - name: dragon rising attack_5
       rect:
         serializedVersion: 2
         x: 2560
@@ -116,10 +120,50 @@ TextureImporter:
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-    - name: dragon hurt_6
+    - name: dragon rising attack_6
       rect:
         serializedVersion: 2
         x: 3072
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: dragon rising attack_7
+      rect:
+        serializedVersion: 2
+        x: 3584
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: dragon rising attack_8
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: dragon rising attack_9
+      rect:
+        serializedVersion: 2
+        x: 4608
+        y: 0
+        width: 512
+        height: 512
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: dragon rising attack_10
+      rect:
+        serializedVersion: 2
+        x: 5120
         y: 0
         width: 512
         height: 512

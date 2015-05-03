@@ -86,6 +86,9 @@ class KnightController : MonoBehaviour {
 					if (state != State.HURT) {
 						moveTimer = 0;
 					}
+					AudioManager.GetInstance().PlayClip(6);
+
+					return;
 				}
 			}
 		}
@@ -110,6 +113,8 @@ class KnightController : MonoBehaviour {
 			} else if (Input.GetButtonDown("Y_1")) {
 				state = State.BLOCK;
 				m_animator.SetTrigger("Block");
+				AudioManager.GetInstance().PlayClip(12);
+
 				StartMove();
 			}
 		}
@@ -170,6 +175,7 @@ class KnightController : MonoBehaviour {
 			case State.PUNCHING:
 				if (moveTimer > PUNCH[WINDUP] && !movedUsed) {
 					// Spawn punch
+					AudioManager.GetInstance().PlayClip(0);
 					pHitbox = Instantiate(Resources.Load("K_PUNCH_BOX", typeof(GameObject))) as GameObject;
 					pHitbox.transform.position = new Vector3(transform.position.x, transform.position.y, 0);
 					pHitbox.GetComponent<SpriteRenderer>().enabled = false;
@@ -207,6 +213,7 @@ class KnightController : MonoBehaviour {
 					if (transform.localScale.x < 0) {
 						pHitbox.transform.localScale = new Vector3(-1 * pHitbox.transform.localScale.x, pHitbox.transform.localScale.y, pHitbox.transform.localScale.z);
 					}
+					AudioManager.GetInstance().PlayClip(11);
 
 					var col = pHitbox.GetComponent<BoxCollider2D>();
 					col.offset = new Vector2(0, ROK_PUNCH[OFFSETY]);
@@ -245,6 +252,7 @@ class KnightController : MonoBehaviour {
 				if (queuedMove == Move.JUMP) {
 					if (Math.Sign(extentX) != -Math.Sign(transform.localScale.x) && Math.Abs(extentX) > 0.001 && jumpPower > 17) {
 						body.AddForce(new Vector2(20 * jumpPower * extentX, 14 * jumpPower), ForceMode2D.Impulse);
+						AudioManager.GetInstance().PlayClip(3);
 					} else {
 						body.AddForce(new Vector2(5 * jumpPower * extentX, 20 * jumpPower), ForceMode2D.Impulse);
 					}
@@ -261,6 +269,8 @@ class KnightController : MonoBehaviour {
 						if (transform.localScale.x < 0) {
 							pHitbox.transform.localScale = new Vector3(-1 * pHitbox.transform.localScale.x, pHitbox.transform.localScale.y, pHitbox.transform.localScale.z);
 						}
+						AudioManager.GetInstance().PlayClip(11);
+
 						var col = pHitbox.GetComponent<BoxCollider2D>();
 						col.offset = new Vector2(-Math.Sign(transform.localScale.x) * ROK_PUNCH[OFFSETX], ROK_PUNCH[OFFSETY]);
 						col.size = new Vector2(ROK_PUNCH[WIDTH], ROK_PUNCH[HEIGHT]);

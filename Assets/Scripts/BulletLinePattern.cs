@@ -44,6 +44,8 @@ class BulletLinePattern : BulletPattern {
 				{
 					bullet = BulletManager.Inst.GetBullet();
 				}
+				AudioManager.GetInstance().PlayClip(14);
+
 				bullet.transform.position = new Vector3(spawn.x, spawn.y, 0.0f);
 				bullet.GetComponent<Rigidbody2D>().gravityScale = 0;
 				bullet.GetComponent<Rigidbody2D>().velocity = Quaternion.AngleAxis(AngleOffset, Vector3.forward) * (Vector2)(Vector3.Normalize(target - spawn) * Speed);

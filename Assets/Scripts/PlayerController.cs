@@ -344,16 +344,17 @@ public class WalkState : PlayerBase
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
 //Debug.Log("Walking");
-    }
+				//AudioManager.GetInstance().PlayClip(10);
+	}
 
-    public override void UpdateState()
+	public override void UpdateState()
     {
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         //input
         /// new code
         float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_maxSpeed); 
-        ///
-        if(m_cont.m_rightKey)
+		///
+		if (m_cont.m_rightKey)
         {
             m_cont.m_rb.AddForce(new Vector2(m_cont.m_movementMultiplier * l_accelerationMultiplier, 0.0f));
             //m_cont.m_rb.velocity = new Vector2(m_cont.m_movementMultiplier, m_cont.m_rb.velocity.y);
@@ -414,9 +415,11 @@ public class JumpState : PlayerBase
             m_jumpTime = m_cont.m_jumpDuration;
         else
             m_jumpTime = 0;
-    }
+		AudioManager.GetInstance().PlayClip(19);
 
-    public override void UpdateState()
+	}
+
+	public override void UpdateState()
     {
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         m_jumpTime -= Time.fixedDeltaTime;
@@ -436,12 +439,14 @@ public class JumpState : PlayerBase
         if (m_cont.m_chompKey)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.StompState);
 
-        if(m_cont.m_grounded && m_jumpTime < 0)
-            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
-        
-    }
+		if (m_cont.m_grounded && m_jumpTime < 0) {
+			m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
+			AudioManager.GetInstance().PlayClip(16);
+		}
 
-    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+		}
+
+	public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
     }
 }
@@ -532,8 +537,9 @@ public class ChompState : PlayerBase
             if (m_hasChomped == false)
             {
                 m_hitbox = Object.Instantiate(Resources.Load("ChompBox", typeof(GameObject))) as GameObject;
-                
-                if (m_lastState == PlayerController.CharacterStateNames.CrouchState)
+				AudioManager.GetInstance().PlayClip(7);
+
+				if (m_lastState == PlayerController.CharacterStateNames.CrouchState)
                     m_hitbox.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 3.0f, -1, 0);
                 else
                     m_hitbox.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.1f, 0, 0);
@@ -607,7 +613,9 @@ public class ShootState : PlayerBase
             if (!m_hasShot && m_ShootDelayTime < 0)
             {
                 GameObject bullet = Object.Instantiate(Resources.Load("FireBall", typeof(GameObject))) as GameObject;
-                bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0.6f, 0);
+				AudioManager.GetInstance().PlayClip(11);
+
+				bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0.6f, 0);
                 if (m_cont.m_Direction > 0 && m_shootDirection.y > 0)
                     bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 45));
                 if (m_cont.m_Direction > 0 && m_shootDirection.y < 0)
@@ -689,7 +697,8 @@ public class StompState : PlayerBase
         if (m_cont.m_grounded) //when hits the ground
         {
             GameObject buttSmoke = Object.Instantiate(Resources.Load("ButtSmoke", typeof(GameObject))) as GameObject;
-            buttSmoke.transform.position = m_cont.transform.position + new Vector3(0, -1.35f, 0);
+			AudioManager.GetInstance().PlayClip(1);
+			buttSmoke.transform.position = m_cont.transform.position + new Vector3(0, -1.35f, 0);
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
         }
             
@@ -717,7 +726,8 @@ public class BlockState : PlayerBase
         m_blockTime = m_cont.m_blockDuration;
         //Debug.Log("Blocking");
         Shield = Object.Instantiate(Resources.Load("DragonShield", typeof(GameObject))) as GameObject;
-        Vector3 l_facing = Shield.transform.localScale;
+		AudioManager.GetInstance().PlayClip(20);
+		Vector3 l_facing = Shield.transform.localScale;
         l_facing.x = m_cont.m_Direction*-1;
         Shield.transform.localScale = l_facing;
         Shield.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction*2, 0,0);;
@@ -801,10 +811,13 @@ public class RisingState : PlayerBase
     {
         m_riseTime = m_cont.m_riseDuration;
         m_direction = m_cont.m_Direction;
-        //Debug.Log("Rising!");
-    }
 
-    public override void UpdateState()
+		AudioManager.GetInstance().PlayClip(3);
+
+		//Debug.Log("Rising!");
+	}
+
+	public override void UpdateState()
     {
         m_riseTime -= Time.fixedDeltaTime;
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);

@@ -36,8 +36,7 @@ public class AudioManager : MonoBehaviour {
     #region Unity Defaults
     void Awake()
     {
-        soundPlayer = new AudioSource();
-        musicPlayer = new AudioSource();
+		m_instance = gameObject.GetComponent<AudioManager>();
     }
 
     public void PlayMusic(int tracknum)
@@ -49,7 +48,6 @@ public class AudioManager : MonoBehaviour {
 
     public void PlayClip(int clipnum)
     {
-        
         soundPlayer.clip = clips[clipnum];
         soundPlayer.Play();
     }

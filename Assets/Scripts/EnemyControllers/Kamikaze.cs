@@ -67,12 +67,14 @@ public class Kamikaze : MonoBehaviour {
                     }
                     
                     m_currentState = KamikazeState.Approach;
-                }
+					AudioManager.GetInstance().PlayClip(8);
 
-                break;
+				}
+
+				break;
             case KamikazeState.Approach:
 
-                ApplyMovement();
+				ApplyMovement();
 
 				if (Mathf.Abs(transform.position.x - m_target.transform.position.x) > m_disappearDist)
 				{

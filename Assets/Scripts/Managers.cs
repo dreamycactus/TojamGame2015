@@ -76,7 +76,6 @@ public class Managers : MonoBehaviour
 
         m_gameStateManager = gameObject.AddComponent<GameStateManager>();
         m_gameStateManager.Init();
-        m_audioManager = gameObject.AddComponent<AudioManager>();
         m_inputHandler = gameObject.AddComponent<InputHandler>();
         m_uiManager = gameObject.AddComponent<UIManager>();
         m_playerManager = gameObject.AddComponent <PlayerManager>();

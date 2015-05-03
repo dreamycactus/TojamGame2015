@@ -54,13 +54,7 @@ public class Health : MonoBehaviour
 
             if( col.tag == "Player")
             {
-                PlayerController cont = gameObject.GetComponent<PlayerController>();
-                if (cont != null)
-                {
-                    cont.ChangePlayerState(PlayerController.CharacterStateNames.HurtState);
-                }
-                else
-                    gameObject.SendMessage("ApplyDamage", p_dmg);
+                 gameObject.SendMessage("ApplyDamage", p_dmg);
             }
 
             if (m_currentHealth <= 0)

@@ -76,7 +76,8 @@ public class PlayerController : MonoBehaviour {
         BlockState = 8,
         DashState = 9,
         RisingState = 10,
-        HurtState = 11
+        HurtState = 11,
+        DeadState = 12
     }
     private Dictionary<CharacterStateNames, PlayerBase> m_gameStateDictionary = new Dictionary<CharacterStateNames, PlayerBase>();
     private PlayerBase m_currentGameState = null;
@@ -211,6 +212,7 @@ public class PlayerController : MonoBehaviour {
         m_gameStateDictionary.Add(CharacterStateNames.DashState, new DashState(this));
         m_gameStateDictionary.Add(CharacterStateNames.RisingState, new RisingState(this));
         m_gameStateDictionary.Add(CharacterStateNames.HurtState, new HurtState(this));
+        m_gameStateDictionary.Add(CharacterStateNames.DeadState, new DeadState(this));
 
         //start the state machine
         ChangePlayerState(CharacterStateNames.IdleState); //starts in the idle
@@ -222,6 +224,11 @@ public class PlayerController : MonoBehaviour {
     void ApplyDamage(int dmg)
     {
         ChangePlayerState(CharacterStateNames.HurtState);
+    }
+
+    void EnterDeathState()
+    {
+        ChangePlayerState(CharacterStateNames.DeadState);
     }
 
     //Change the game state (occurs on next frame)
@@ -282,7 +289,7 @@ public class IdlePlayer : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("Idling");
+        //Debug.Log("Idling");
     }
 
     public override void UpdateState()
@@ -332,7 +339,7 @@ public class WalkState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("Walking");
+//Debug.Log("Walking");
     }
 
     public override void UpdateState()
@@ -447,7 +454,7 @@ public class CrouchState : PlayerBase
     
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("In Crouching State");
+        //Debug.Log("In Crouching State");
         m_col.size = new Vector2(4.0f, 2.0f);
         m_col.offset = new Vector2(0.0f, -1.2f);
     }
@@ -501,7 +508,7 @@ public class ChompState : PlayerBase
         m_col.offset = new Vector2(0.0f, -1.2f);
         m_hasChomped = false;
 
-        Debug.Log("Chomp");
+        //Debug.Log("Chomp");
     }
 
     public override void UpdateState()
@@ -569,7 +576,7 @@ public class ShootState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("Shooting a fireball");
+        //Debug.Log("Shooting a fireball");
         m_ShootTime = m_cont.m_shootDuration;
         m_ShootDelayTime = m_cont.m_ShootDelayTime;
         m_laststate = p_prevState;
@@ -648,7 +655,7 @@ public class StompState : PlayerBase
         flag = false;
         m_hasStomped = false;
         m_lastState = p_prevState;
-        Debug.Log("Stomping");
+        //Debug.Log("Stomping");
     }
 
     public override void UpdateState()
@@ -705,7 +712,7 @@ public class BlockState : PlayerBase
     {
         m_cont.GetComponent<Health>().Blocking = true;
         m_blockTime = m_cont.m_blockDuration;
-        Debug.Log("Blocking");
+        //Debug.Log("Blocking");
     }
 
     public override void UpdateState()
@@ -742,7 +749,7 @@ public class DashState : PlayerBase
     {
         m_dashTime = m_cont.m_dashDuration;
         m_direction = m_cont.m_Direction;
-        Debug.Log("Dashing!");
+        //Debug.Log("Dashing!");
     }
 
     public override void UpdateState()
@@ -784,7 +791,7 @@ public class RisingState : PlayerBase
     {
         m_riseTime = m_cont.m_riseDuration;
         m_direction = m_cont.m_Direction;
-        Debug.Log("Rising!");
+        //Debug.Log("Rising!");
     }
 
     public override void UpdateState()
@@ -848,5 +855,30 @@ public class HurtState : PlayerBase
 
     }
 
+
+}
+
+//dead in this state
+public class DeadState : PlayerBase
+{
+    public DeadState(PlayerController p_cont)
+    {
+        m_cont = p_cont;
+    }
+
+    public override void EnterState(PlayerController.CharacterStateNames p_prevState)
+    {
+        GameObject exp = ExplosionManager.Inst.GetExplosion();
+        exp.transform.position = m_cont.gameObject.transform.position;
+        Object.Destroy(m_cont.gameObject);
+    }
+
+    public override void UpdateState()
+    {
+    }
+
+    public override void ExitState(PlayerController.CharacterStateNames p_nextState)
+    {
+    }
 
 }

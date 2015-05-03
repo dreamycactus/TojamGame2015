@@ -221,13 +221,14 @@ public class PlayerController : MonoBehaviour {
 
     }
 
-    void ApplyDamage(int dmg)
+    public void ApplyDamage(int dmg)
     {
         ChangePlayerState(CharacterStateNames.HurtState);
     }
 
-    void EnterDeathState()
+    public void EnterDeathState()
     {
+        Debug.Log("Message Received");
         ChangePlayerState(CharacterStateNames.DeadState);
     }
 
@@ -470,8 +471,6 @@ public class CrouchState : PlayerBase
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.RisingState);
         if (m_cont.m_blockKey && m_cont.m_blockCooldown < 0)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.BlockState);
-        if (m_cont.m_dashKey && m_cont.m_dashCooldown < 0)
-            m_cont.ChangePlayerState(PlayerController.CharacterStateNames.DashState);
 
         if (!m_cont.m_downKey)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.IdleState);
@@ -761,7 +760,7 @@ public class DashState : PlayerBase
         {
             /// new code
             float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_dashSpeed);
-            m_cont.m_rb.AddForce(new Vector2(m_direction * m_cont.m_stompForwardMagnitude * l_accelerationMultiplier * 3f, 0.0f));
+            m_cont.m_rb.AddForce(new Vector2(m_direction * m_cont.m_movementMultiplier * l_accelerationMultiplier * 3f, 0.0f));
             ///
             //Vector2 temp = m_cont.m_rb.velocity;
             //temp.x = m_cont.m_dashSpeed * m_direction;
@@ -833,6 +832,7 @@ public class HurtState : PlayerBase
     {
         m_direction = m_cont.m_Direction;
         m_hurtTimer = m_cont.m_hurtTimer;
+        Debug.Log("Dragon was Hurt");
     }
     public override void UpdateState()
     {
@@ -868,6 +868,7 @@ public class DeadState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
+        Debug.Log("DYING DRAGON");
         GameObject exp = ExplosionManager.Inst.GetExplosion();
         exp.transform.position = m_cont.gameObject.transform.position;
         Object.Destroy(m_cont.gameObject);

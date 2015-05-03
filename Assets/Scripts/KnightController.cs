@@ -19,11 +19,16 @@ class KnightController : MonoBehaviour {
 		WINDDOWN = 1,
 		LASER_MIN = 2,
 		LASER_MAX = 3;
-
+	enum Move {
+		PUNCH,
+		JUMP,
+		LASER,
+		NONE
+	}
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
-	readonly float[] JUMP			= { 0.1f, 0.2f };
-	readonly float[] PUNCH			= { 0.5f, 0.5f, 0.5f };
+	readonly float[] JUMP			= { 0.2f, 0.1f };
+	readonly float[] PUNCH			= { 0.1f, 0.5f, 0.5f };
 	readonly float[] ROK_PUNCH		= { 0.05f, 0.05f, 0.3f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
 	readonly float HURT				= 0.2f;
@@ -37,6 +42,7 @@ class KnightController : MonoBehaviour {
 	bool isLeft = false;
 	float laserEnd = 0;
 	bool movedUsed = false;
+	bool landed = true;
 	Rigidbody2D body;
 	float jumpPower;
 	private GameObject m_Camera;
@@ -45,6 +51,7 @@ class KnightController : MonoBehaviour {
 	private float m_camDepth = -10;
 	private Animator m_animator;
 	float extentX;
+	Move queuedMove;
 
 	void Start() {
 		body = gameObject.GetComponent<Rigidbody2D>();
@@ -58,10 +65,18 @@ class KnightController : MonoBehaviour {
 		set { m_Camera = value; }
 	}
 	void OnCollisionEnter2D(Collision2D col) {
-		if (col.gameObject.tag == "Floor" && state == State.INAIR) {
-			state = State.FREE;
-			body.drag = 3.0f;
+		if (state == State.INAIR) {
+			foreach (ContactPoint2D tact in col.contacts) {
+				if (state == State.INAIR && tact.normal == Vector2.up && movedUsed) {
+					m_animator.SetBool("Jumping", false);
+					landed = true;
+					moveTimer = 0;
+				}
+			}
 		}
+	}
+	void OnCollisionStay2D(Collision2D coll) {
+		
 	}
 	void Update() {
 		//keep up with camera
@@ -69,6 +84,26 @@ class KnightController : MonoBehaviour {
 		m_Camera.transform.position = m_camOffset;
 
 		extentX = Input.GetAxis("L_XAxis_1");
+		if (queuedMove == Move.NONE && state == State.FREE) {
+			if (Input.GetButtonDown("A_1")) {
+				state = State.INAIR;
+				StartMove();
+			} else if (Input.GetButtonDown("B_1")) {
+				queuedMove = Move.LASER;
+			} else if (Input.GetButtonDown("X_1")) {
+				queuedMove = Move.PUNCH;
+			}
+		}
+		if (state == State.INAIR && !movedUsed) {
+			if (Input.GetButtonUp("A_1")) {
+				queuedMove = Move.JUMP;
+				jumpPower = 16;
+			}
+			if (moveTimer > JUMP[0]) {
+				queuedMove = Move.JUMP;
+				jumpPower = 20;
+			}
+		}
 	}
 	void FixedUpdate() {
 		switch(state) {
@@ -80,16 +115,22 @@ class KnightController : MonoBehaviour {
 				} else if (extentX < -0.5f && transform.localScale.x < 0) {
 					FlipSprite();
 				}
-				if (Input.GetButtonDown("A_1")) {
-					StartMove();
-					state = State.INAIR;
-					body.drag = 0.1f;
-				} else if (Input.GetButtonDown("B_1")) {
-					StartMove();
-					state = State.LASERING;
-				} else if (Input.GetButtonDown("X_1")) {
-					StartMove();
-					state = State.PUNCHING;
+				switch(queuedMove) {
+					case Move.JUMP:
+						
+						break;
+					case Move.LASER:
+						StartMove();
+						state = State.LASERING;
+						queuedMove = Move.NONE;
+						break;
+					case Move.PUNCH:
+						StartMove();
+						state = State.PUNCHING;
+						queuedMove = Move.NONE;
+						break;
+					default:
+						break;
 				}
 				break;
 			case State.HURT:
@@ -142,21 +183,24 @@ class KnightController : MonoBehaviour {
 				}
 				break;
 			case State.INAIR:
-				extentX = Input.GetAxis("L_XAxis_1");
-				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED) {
-					body.AddForce(new Vector2(extentX * 20.0f, 0), ForceMode2D.Impulse);
-				}
-				if (Input.GetButtonUp("A_1") && moveTimer < JUMP[WINDUP] && !movedUsed) {
-					jumpPower = 10;
-					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
+				body.drag = 0.1f;
+				if (queuedMove == Move.JUMP) {
+					if (Math.Sign(extentX) != -Math.Sign(transform.localScale.x) && jumpPower > 17) {
+						body.AddForce(new Vector2(20 * jumpPower * extentX, 14 * jumpPower), ForceMode2D.Impulse);
+					} else {
+						body.AddForce(new Vector2(10 * jumpPower * extentX, 20 * jumpPower), ForceMode2D.Impulse);
+					}
+					landed = false;
+					queuedMove = Move.NONE;
 					movedUsed = true;
 					m_animator.SetBool("Jumping", true);
 				}
-				if (moveTimer > JUMP[WINDUP] && !movedUsed) {
-					jumpPower = 15;
-					body.AddForce(new Vector2(0, 20 * jumpPower), ForceMode2D.Impulse);
-					movedUsed = true;
-					m_animator.SetBool("Jumping", true);
+				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED && !landed && movedUsed) {
+					body.AddForce(new Vector2(extentX * 15.0f, 0), ForceMode2D.Impulse);
+				}
+				if (landed && movedUsed && moveTimer > JUMP[WINDDOWN]) {
+					state = State.FREE;
+					body.drag = 3.0f;
 				}
 				break;
 			case State.INAIR_LASERING:

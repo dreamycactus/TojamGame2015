@@ -25,13 +25,33 @@ public class Fireball : MonoBehaviour {
     #region Unity Defaults
     void Awake()
     {
+
     }
     public void Init()
     {
+
         Physics2D.IgnoreCollision(l_shootingPlayer, GetComponent<Collider2D>());
+
     }
 
 	public void Update() {
+        int l_direction = 1;
+        if (gameObject.GetComponent<Rigidbody2D>().velocity.x < 0 && transform.localScale.x < 0)
+        {
+            l_direction = 1;
+            Vector3 l_facing = transform.localScale;
+            l_facing.x = l_direction * transform.localScale.x;
+            transform.localScale = l_facing;
+        }
+        else if (gameObject.GetComponent<Rigidbody2D>().velocity.x > 0 && transform.localScale.x > 0)
+        {
+            l_direction = -1;
+            Vector3 l_facing = transform.localScale;
+            l_facing.x = l_direction * transform.localScale.x;
+            transform.localScale = l_facing;
+        }
+
+
 		if (m_currentLife > 0)
         {
             m_currentLife -= Time.deltaTime;
@@ -49,6 +69,13 @@ public class Fireball : MonoBehaviour {
             Destroy(this.gameObject);
             Debug.Log("Player Hit");
         }
+
+    }
+
+    void FixedUpdate()
+    {
+
+
 
     }
 

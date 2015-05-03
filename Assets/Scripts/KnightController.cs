@@ -20,14 +20,10 @@ class KnightController : MonoBehaviour {
 		LASER_MIN = 2,
 		LASER_MAX = 3;
 
+
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
-<<<<<<< HEAD
 	readonly float[] JUMP			= { 0.1f, 0.2f };
 	readonly float[] PUNCH			= { 0.5f, 0.5f, 0.5f };
-=======
-	readonly float[] JUMP			= { 0.15f, 0.2f };
-	readonly float[] PUNCH			= { 0.05f, 0.05f, 0.3f };
->>>>>>> 3ba852530e286be62c870386ebcb94d490d22ed9
 	readonly float[] ROK_PUNCH		= { 0.05f, 0.05f, 0.3f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
 	readonly float HURT				= 0.2f;
@@ -43,15 +39,12 @@ class KnightController : MonoBehaviour {
 	bool movedUsed = false;
 	Rigidbody2D body;
 	float jumpPower;
-<<<<<<< HEAD
 	private GameObject m_Camera;
 	private float m_size;
 	private Vector3 m_camOffset;
 	private float m_camDepth = -10;
 	private Animator m_animator;
-=======
 	float extentX;
->>>>>>> 3ba852530e286be62c870386ebcb94d490d22ed9
 
 	void Start() {
 		body = gameObject.GetComponent<Rigidbody2D>();
@@ -71,32 +64,22 @@ class KnightController : MonoBehaviour {
 		}
 	}
 	void Update() {
-<<<<<<< HEAD
 		//keep up with camera
 		m_camOffset.x = transform.position.x;
 		m_Camera.transform.position = m_camOffset;
-	}	
-	void FixedUpdate() {
-		switch(state) {
-			case State.FREE:
-				var extent = Input.GetAxis("L_XAxis_1");
-					body.AddForce(new Vector2(extent*1000, 0));
-					m_animator.SetFloat("RunSpeed", Mathf.Abs(extent));
-					if (extent > 0.5f && transform.localScale.x > 0) {
-						FlipSprite();
-					} else if (extent < -0.5f && transform.localScale.x < 0) {
-						FlipSprite();
-					}
-=======
+
 		extentX = Input.GetAxis("L_XAxis_1");
 	}
 	void FixedUpdate() {
 		switch(state) {
 			case State.FREE:
-				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED) {
-					body.AddForce(new Vector2(extentX * 20.0f, 0), ForceMode2D.Impulse);
+				body.AddForce(new Vector2(extentX*1000, 0));
+				m_animator.SetFloat("RunSpeed", Mathf.Abs(extentX));
+				if (extentX > 0.5f && transform.localScale.x > 0) {
+					FlipSprite();
+				} else if (extentX < -0.5f && transform.localScale.x < 0) {
+					FlipSprite();
 				}
->>>>>>> 3ba852530e286be62c870386ebcb94d490d22ed9
 				if (Input.GetButtonDown("A_1")) {
 					StartMove();
 					state = State.INAIR;
@@ -157,7 +140,6 @@ class KnightController : MonoBehaviour {
 					// Destroy punch
 					state = State.FREE;
 				}
-
 				break;
 			case State.INAIR:
 				extentX = Input.GetAxis("L_XAxis_1");

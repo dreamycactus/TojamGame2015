@@ -42,7 +42,11 @@ public class Health : MonoBehaviour
 
     public void TakeDamage(int p_dmg, Collider2D col)
     {
-		
+		if (gameObject.tag == "Player") {
+			Rigidbody2D body = gameObject.GetComponent<Rigidbody2D>();
+			float force = 300 * p_dmg / 5 * Mathf.Sign(transform.position.x- col.transform.position.x);
+			body.AddForce(new Vector2(force, 0), ForceMode2D.Impulse);
+		}
         if(blocking)
         {
             Debug.Log("blocked");
@@ -52,7 +56,7 @@ public class Health : MonoBehaviour
 			m_currentHealth -= p_dmg;
             Debug.Log(m_currentHealth);
 
-            if( col.tag == "Player" && m_currentHealth > 0)
+            if( gameObject.tag == "Player" && m_currentHealth > 0)
             {
                  gameObject.SendMessage("ApplyDamage", p_dmg);
             }

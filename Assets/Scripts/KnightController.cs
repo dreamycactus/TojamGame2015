@@ -35,6 +35,7 @@ class KnightController : MonoBehaviour {
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
 	readonly float[] JUMP			= { 0.1f, 0.1f };
+	readonly float[] BLOCK			= { 0.1f, 0.1f };
 	readonly float[] PUNCH			= { 0.01f, 0.1f, 0.1f, 0.5f, -0.2f };
 	readonly float[] ROK_PUNCH		= { 0.3f, 0.3f, 0.5f, 0.5f, -0.4f, 2.0f, 1.0f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
@@ -60,6 +61,7 @@ class KnightController : MonoBehaviour {
 	float extentX;
 	Move queuedMove;
 	float moveTimer2;
+	bool isBlocking = false;
 
 	GameObject pHitbox;
 
@@ -105,6 +107,10 @@ class KnightController : MonoBehaviour {
 				queuedMove = Move.ROCKET;
 			} else if (Input.GetButtonDown("X_1")) {
 				queuedMove = Move.PUNCH;
+			} else if (Input.GetButtonDown("Y_1")) {
+				state = State.BLOCK;
+				m_animator.SetTrigger("Block");
+				StartMove();
 			}
 		}
 		if (state == State.INAIR) {
@@ -154,6 +160,7 @@ class KnightController : MonoBehaviour {
 					default:
 						break;
 				}
+				
 				break;
 			case State.HURT:
 				if (moveTimer > HURT) {
@@ -288,6 +295,19 @@ class KnightController : MonoBehaviour {
 				break;
 			case State.INAIR_ROCKET:
 				break;
+			case State.BLOCK:
+				if (moveTimer > BLOCK[WINDUP]) {
+					isBlocking = true;
+					GetComponent<Health>().Blocking = true;
+				}
+				if (moveTimer > BLOCK[WINDUP] + 0.2f) {
+					isBlocking = false;
+					GetComponent<Health>().Blocking = false;
+				}
+				if (moveTimer > BLOCK[WINDUP] + 0.2f + BLOCK[WINDDOWN]) {
+					state = State.FREE;
+				}
+				break;
 		}
 		moveTimer += Time.deltaTime;
 		moveTimer2 += Time.deltaTime;
@@ -301,6 +321,9 @@ class KnightController : MonoBehaviour {
 	}
 
 	void ApplyDamage(int dmg) {
+		if (isBlocking) {
+			return;
+		}
 		m_animator.SetTrigger("Hurt");
 		state = State.HURT;
 		moveTimer = 0;

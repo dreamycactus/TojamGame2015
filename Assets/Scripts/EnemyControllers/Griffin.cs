@@ -32,19 +32,26 @@ class Griffin : MonoBehaviour {
 		Physics2D.IgnoreCollision(players[0].GetComponent<Collider2D>(), GetComponent<Collider2D>());
 		Physics2D.IgnoreCollision(players[1].GetComponent<Collider2D>(), GetComponent<Collider2D>());
 
+		bEmitter = gameObject.GetComponent<BulletEmitter>();
+
 		if (Mathf.Abs(transform.position.x - players[0].transform.position.x) < Mathf.Abs(transform.position.x - players[1].transform.position.x))
 		{
 			targetPlayer = players[0];
 			speed = -Math.Abs(speed);
+			bEmitter.Patterns[0] = "line:3:20";
+			bEmitter.Refresh();
 		}
 		else
 		{
 			targetPlayer = players[1];
 			speed = Math.Abs(speed);
+			bEmitter.Patterns[0] = "line:3:-20";
+			bEmitter.Refresh();
+			FlipSprite();
 		}
 
 		idealHeight = transform.position.y;
-		bEmitter = gameObject.GetComponent<BulletEmitter>();
+		
 	}
 
 	void Update() {
@@ -87,5 +94,10 @@ class Griffin : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D col) {
 		
+	}
+
+	private void FlipSprite()
+	{
+		transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
 	}
 }

@@ -134,6 +134,15 @@ public class SoldierController : MonoBehaviour {
                     ApplyMovement(true);
                 }
 
+				if (transform.position.x - m_target.transform.position.x > 0 && transform.localScale.x < 0)
+				{
+					FlipSprite();
+				}
+				else if (transform.position.x - m_target.transform.position.x < 0 && transform.localScale.x > 0)
+				{
+					FlipSprite();
+				}
+
                 if (Mathf.Abs(transform.position.x - m_target.transform.position.x) > m_disappearDist)
                 {
                     Destroy(gameObject);    //Destroys enemy if player gets too far
@@ -181,4 +190,9 @@ public class SoldierController : MonoBehaviour {
         }
         
     }
+
+	private void FlipSprite()
+	{
+		transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
+	}
 }

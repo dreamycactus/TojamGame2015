@@ -52,7 +52,7 @@ public class Health : MonoBehaviour
 			m_currentHealth -= p_dmg;
             Debug.Log(m_currentHealth);
 
-            if( col.tag == "Player")
+            if( col.tag == "Player" && m_currentHealth > 0)
             {
                  gameObject.SendMessage("ApplyDamage", p_dmg);
             }

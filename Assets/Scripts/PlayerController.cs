@@ -228,7 +228,7 @@ public class PlayerController : MonoBehaviour {
 
     public void EnterDeathState()
     {
-        Debug.Log("Message Received");
+        //Debug.Log("Message Received");
         ChangePlayerState(CharacterStateNames.DeadState);
     }
 
@@ -238,6 +238,9 @@ public class PlayerController : MonoBehaviour {
         if (!m_gameStateDictionary.ContainsKey(nextState))
             return;
         m_animator.SetInteger(HashIDs.State, (int)nextState);
+
+        if (m_nextGameStateIndex == CharacterStateNames.DeadState)
+            return;
         if (m_nextGameStateIndex == CharacterStateNames.HurtState)
             return;
 
@@ -832,7 +835,7 @@ public class HurtState : PlayerBase
     {
         m_direction = m_cont.m_Direction;
         m_hurtTimer = m_cont.m_hurtTimer;
-        Debug.Log("Dragon was Hurt");
+        //Debug.Log("Dragon was Hurt");
     }
     public override void UpdateState()
     {
@@ -868,7 +871,7 @@ public class DeadState : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
-        Debug.Log("DYING DRAGON");
+        //Debug.Log("DYING DRAGON");
         GameObject exp = ExplosionManager.Inst.GetExplosion();
         exp.transform.position = m_cont.gameObject.transform.position;
         Object.Destroy(m_cont.gameObject);

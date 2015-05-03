@@ -23,12 +23,13 @@ public class PlayerController : MonoBehaviour {
     public float m_ShootDelayTime; //how long you wait before firing
     public float m_bulletSpeed;//how fast the bullets fly
     public float m_stompPauseDuration; //how long you hang in the air before stomping
+    public float m_stompForwardMagnitude; //the force multiplier forward motion on stomping;
     public float m_stompSpeed;//how fast you fall when stomping
     public float m_blockDuration; // length of block
     public float m_maxBlockCoolDown;// how long between blocks (max time)
     public float m_blockCooldown;  //inner cooldown used by class, starts at maxBlockCoolDown
     public float m_dashSpeed; //how fast you dash
-    public float m_dashDuration;
+    public float m_dashDuration; //how long the dash lasts
     public float m_maxDashCoolDown; // cooldown between dashes
     public float m_dashCooldown; //inner cooldown used by clss, starts at maxDashCooldown
     public float m_riseDuration; //how long you are rising for
@@ -117,6 +118,7 @@ public class PlayerController : MonoBehaviour {
         m_ShootDelayTime = 0.3f; //how long you wait before firing
         m_bulletSpeed = 20.0f; //how fast the bullets fly
         m_stompPauseDuration = 0.1f; //how long you hang in the air before stomping
+        m_stompForwardMagnitude = 5.0f; //the force multiplier forward motion on stomping;
         m_stompSpeed = 25.0f; //how fast you fall when stomping
         m_blockDuration = 0.5f; // length of block
         m_maxBlockCoolDown = 0.5f; // how long between blocks (max time)
@@ -584,7 +586,7 @@ public class ShootState : PlayerBase
             if (!m_hasShot)
             {
                 GameObject bullet = Object.Instantiate(Resources.Load("FireBall", typeof(GameObject))) as GameObject;
-                bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0, 0);
+                bullet.transform.position = m_cont.transform.position + new Vector3(m_cont.m_Direction * 2.0f, 0.4f, 0);
                 if (m_cont.m_Direction > 0 && m_shootDirection.y > 0)
                     bullet.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 45));
                 if (m_cont.m_Direction > 0 && m_shootDirection.y < 0)
@@ -658,6 +660,7 @@ public class StompState : PlayerBase
         if (m_stompTime < 0 && !flag)
         {
             m_cont.m_rb.velocity = new Vector2(0, m_cont.m_stompSpeed);
+            m_cont.m_rb.AddForce(new Vector2(m_cont.m_Direction * m_cont.m_movementMultiplier*5f, 0.0f));
             flag = true;
         }
 
@@ -739,7 +742,7 @@ public class DashState : PlayerBase
         {
             /// new code
             float l_accelerationMultiplier = 1 - (m_cont.m_rb.velocity.magnitude / m_cont.m_dashSpeed);
-            m_cont.m_rb.AddForce(new Vector2(m_direction*m_cont.m_movementMultiplier * l_accelerationMultiplier*3f, 0.0f));
+            m_cont.m_rb.AddForce(new Vector2(m_direction * m_cont.m_stompForwardMagnitude * l_accelerationMultiplier * 3f, 0.0f));
             ///
             //Vector2 temp = m_cont.m_rb.velocity;
             //temp.x = m_cont.m_dashSpeed * m_direction;

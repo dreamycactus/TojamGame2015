@@ -8,7 +8,7 @@ using System.Collections;
 public class SelfDestruct : MonoBehaviour {
 
 	#region Public Variables
-    private float timer = 0.3f;
+    private float timer = 0.2f;
     #endregion
 
     #region Protected Variables

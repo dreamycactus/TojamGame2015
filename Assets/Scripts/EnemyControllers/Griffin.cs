@@ -22,6 +22,8 @@ class Griffin : MonoBehaviour {
 	private BulletEmitter bEmitter;
     public float m_disappearDist = 20.0f;
 
+	public bool m_isBomber = false;
+
 	void Start() {
 		body = this.gameObject.GetComponent<Rigidbody2D>();
 		state = GriffinState.Idle;
@@ -38,15 +40,25 @@ class Griffin : MonoBehaviour {
 		{
 			targetPlayer = players[0];
 			speed = -Math.Abs(speed);
-			bEmitter.Patterns[0] = "line:3:20";
-			bEmitter.Refresh();
+			if (!m_isBomber) {
+				bEmitter.Patterns[0] = "line:3:20";
+				bEmitter.Refresh();
+			} else {
+				bEmitter.Patterns[0] = "line:1:-15";
+				bEmitter.Refresh();
+			}
 		}
 		else
 		{
 			targetPlayer = players[1];
 			speed = Math.Abs(speed);
-			bEmitter.Patterns[0] = "line:3:-20";
-			bEmitter.Refresh();
+			if (!m_isBomber) {
+				bEmitter.Patterns[0] = "line:3:-20";
+				bEmitter.Refresh();
+			} else {
+				bEmitter.Patterns[0] = "line:1:15";
+				bEmitter.Refresh();
+			}
 			FlipSprite();
 		}
 
@@ -62,8 +74,11 @@ class Griffin : MonoBehaviour {
 					body.velocity = new Vector2(speed, 0);
 					bEmitter.ToggleAutoFire();
 					//TODO Play griffin sound
-					bEmitter.Target = new Vector2(speed * 1000000, transform.position.y);
-
+					if (!m_isBomber) {
+						bEmitter.Target = new Vector2(speed * 1000000, transform.position.y);
+					} else {
+						bEmitter.Target = new Vector2(transform.position.x, -1000);
+					}
 				}
 				break;
 			case GriffinState.Approach:
@@ -71,6 +86,10 @@ class Griffin : MonoBehaviour {
 				//float x = transform.localPosition.x + speed;
 				float y = sinKY * Mathf.Sin(elapsedTime * sinKX) + idealHeight;
 				transform.position = new Vector3(transform.position.x, y, 0);
+
+				if (m_isBomber) {
+					bEmitter.Target = new Vector2(transform.position.x, -1000);
+				}
 
 				if (Mathf.Abs(transform.position.x - targetPlayer.transform.position.x) > m_disappearDist)
 				{
@@ -80,7 +99,7 @@ class Griffin : MonoBehaviour {
 			case GriffinState.Shoot:
 				break;
 			case GriffinState.Death:
-				GameObject exp = Instantiate(Resources.Load("Explosion")) as GameObject;
+				GameObject exp = ExplosionManager.Inst.GetExplosion();
 				exp.transform.position = transform.position;
 				Destroy(this.gameObject);
 				break;

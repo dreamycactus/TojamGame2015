@@ -28,7 +28,7 @@ public class SoldierController : MonoBehaviour {
 
     private BulletEmitter m_bulletEmitter;
 
-    private Animator m_animator;
+    //private Animator m_animator;
 
     private float m_shootTimer = 0;
 
@@ -55,7 +55,7 @@ public class SoldierController : MonoBehaviour {
 			Physics2D.IgnoreCollision(l_playerTwo.GetComponent<Collider2D>(), GetComponent<Collider2D>());
 		}
 
-        m_animator = gameObject.GetComponent<Animator>();
+        //m_animator = gameObject.GetComponent<Animator>();
 
 		if (Mathf.Abs(transform.position.x - l_playerOne.transform.position.x) < Mathf.Abs(transform.position.x - l_playerTwo.transform.position.x))
 		{
@@ -106,11 +106,11 @@ public class SoldierController : MonoBehaviour {
                     {
                         m_rb.velocity = new Vector2(0.0f, 0.0f);    //Stops soldier in place to shoot
 						m_rb.mass = 1000000;
-                        m_animator.SetBool("Stand", true);
+                        //m_animator.SetBool("Stand", true);
                     }
                     else
                     {
-                        m_animator.SetBool("Strafe", true);
+                        //m_animator.SetBool("Strafe", true);
                     }
 
                     m_currentState = SoldierState.Shoot;    //Switch to shooting state
@@ -132,7 +132,7 @@ public class SoldierController : MonoBehaviour {
                     if (m_shootTimer <= 0)
                     {
                         Debug.Log("Shoot animate");
-                        m_animator.SetTrigger("Shoot");
+                        //m_animator.SetTrigger("Shoot");
                         m_shootTimer = Constants.NORMAL_BULLET_PERIOD;
                     }
                 }
@@ -142,7 +142,6 @@ public class SoldierController : MonoBehaviour {
                     ApplyMovement(true);
                 }
 
-				if (m_isTank)
 				if (transform.position.x - m_target.transform.position.x > 0 && transform.localScale.x < 0)
 				{
 					if (m_isTank)
@@ -153,7 +152,8 @@ public class SoldierController : MonoBehaviour {
 
 					FlipSprite();
 				}
-				else if (transform.position.x - m_target.transform.position.x < 0 && transform.localScale.x > 0)
+				
+				if (transform.position.x - m_target.transform.position.x < 0 && transform.localScale.x > 0)
 				{
 					if (m_isTank)
 					{

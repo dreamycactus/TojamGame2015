@@ -81,6 +81,16 @@ public class InputHandler : MonoBehaviour {
         if (Input.GetKeyUp(KeyCode.X))
             m_player1.m_shootKey = false;
 
+        if (Input.GetKeyDown(KeyCode.C))
+            m_player1.m_blockKey = true;
+        if (Input.GetKeyUp(KeyCode.C))
+            m_player1.m_blockKey = false;
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+            m_player1.m_dashKey = true;
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+            m_player1.m_dashKey = false;
+
 
         /****************************************************
          * PLAYER 2 INPUT

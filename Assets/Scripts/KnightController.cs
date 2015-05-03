@@ -15,14 +15,14 @@ class KnightController : MonoBehaviour {
 		HURT
 	}
 	const int WINDUP = 0,
-		MOVE_DURATION = 3,
+		MOVE_DURATION = 2,
 		WINDDOWN = 1,
 		LASER_MIN = 2,
 		LASER_MAX = 3;
 
 	// [WINDUP, ATTACK_LEN, WINDDOWN]
 	readonly float[] JUMP			= { 0.1f, 0.2f };
-	readonly float[] PUNCH			= { 0.05f, 0.05f, 0.3f };
+	readonly float[] PUNCH			= { 0.5f, 0.5f, 0.5f };
 	readonly float[] ROK_PUNCH		= { 0.05f, 0.05f, 0.3f };
 	readonly float[] LASER			= { 0.2f, 0.2f, 1.0f, 2.0f };
 	readonly float HURT				= 0.2f;
@@ -38,23 +38,44 @@ class KnightController : MonoBehaviour {
 	bool movedUsed = false;
 	Rigidbody2D body;
 	float jumpPower;
+	private GameObject m_Camera;
+	private float m_size;
+	private Vector3 m_camOffset;
+	private float m_camDepth = -10;
+	private Animator m_animator;
 
 	void Start() {
 		body = gameObject.GetComponent<Rigidbody2D>();
+		m_animator = gameObject.GetComponent<Animator>();
+		m_camOffset = new Vector3(0, 1.5f, m_camDepth);
+		body.fixedAngle = true;
+		m_size = 0.55f;
 	}
 
+	public GameObject PlayerCamera {
+		set { m_Camera = value; }
+	}
 	void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Floor" && state == State.INAIR) {
 			state = State.FREE;
 		}
 	}
 	void Update() {
+		//keep up with camera
+		m_camOffset.x = transform.position.x;
+		m_Camera.transform.position = m_camOffset;
 	}	
 	void FixedUpdate() {
 		switch(state) {
 			case State.FREE:
 				var extent = Input.GetAxis("L_XAxis_1");
 					body.AddForce(new Vector2(extent*1000, 0));
+					m_animator.SetFloat("RunSpeed", Mathf.Abs(extent));
+					if (extent > 0.5f && transform.localScale.x > 0) {
+						FlipSprite();
+					} else if (extent < -0.5f && transform.localScale.x < 0) {
+						FlipSprite();
+					}
 				if (Input.GetButtonDown("A_1")) {
 					StartMove();
 					state = State.INAIR;
@@ -75,6 +96,12 @@ class KnightController : MonoBehaviour {
 				if (moveTimer > PUNCH[WINDUP] && !movedUsed) {
 					// Spawn punch
 					movedUsed = true;
+					if (isLeft) {
+						m_animator.SetTrigger("PunchLeft");
+					} else {
+						m_animator.SetTrigger("PunchRight");
+					}
+					isLeft = !isLeft;
 				}
 				if (moveTimer > PUNCH[MOVE_DURATION]) {
 					// Destroy punch
@@ -128,9 +155,12 @@ class KnightController : MonoBehaviour {
 
 	void StartMove() {
 		moveTimer = 0;
-		isLeft = false;
 		movedUsed = false;
 		laserEnd = 0;
 		jumpPower = 0;
+	}
+
+	private void FlipSprite() {
+		transform.localScale = new Vector3(-1 * transform.localScale.x, transform.localScale.y, transform.localScale.z);
 	}
 }

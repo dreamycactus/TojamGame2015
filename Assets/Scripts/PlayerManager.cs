@@ -90,7 +90,7 @@ public class PlayerManager : MonoBehaviour {
 
         m_playerCharacters[1] = GameObject.Instantiate(Managers.GetInstance().GetGameProperties().Knight_prefab);
 		m_playerCharacters[1].transform.position = new Vector2(20, 0);
-        //m_playerCharacters[1].GetComponent<PlayerController>().PlayerCamera = m_playerCameras[1];
+        m_playerCharacters[1].GetComponent<KnightController>().PlayerCamera = m_playerCameras[1];
         m_playerControllers[1] = m_playerCharacters[1].GetComponent<KnightController>();
         //m_playerControllers[1].PlayerCamera = m_playerCameras[1];
 

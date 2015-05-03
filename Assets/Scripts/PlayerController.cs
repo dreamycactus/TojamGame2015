@@ -16,8 +16,9 @@ public class PlayerController : MonoBehaviour {
     public float m_jumpSpeed = 15.0f;
     public float m_jumpDuration = 0.3f;
     public float m_chomSpeed = 10.0f;
-    public float m_chompDuration = 0.1f;
-    public float m_shootDuration = 0.2f;
+    public float m_chompDuration = 0.5f;
+    public float m_chompWaitTime = 0.2f;
+    public float m_shootDuration = 0.4f;
     public float m_stompPauseDuration = 0.1f;
     public float m_stompSpeed = 25.0f;
 
@@ -227,6 +228,7 @@ public class IdlePlayer : PlayerBase
 
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
+        Debug.Log("Idling");
     }
 
     public override void UpdateState()
@@ -379,8 +381,6 @@ public class JumpState : PlayerBase
 //Crouching state
 public class CrouchState : PlayerBase
 {
-    Vector3 m_scale;
-
     public CrouchState(PlayerController p_cont)
     {
         m_cont = p_cont;
@@ -389,10 +389,6 @@ public class CrouchState : PlayerBase
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         Debug.Log("In Crouching State");
-        m_scale = m_cont.transform.localScale;
-        m_scale.y *= 0.5f;
-        m_cont.transform.localScale = m_scale;
-
     }
 
     public override void UpdateState()
@@ -406,8 +402,6 @@ public class CrouchState : PlayerBase
         {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
         }
-        
-
 
         if (!m_cont.m_downKey)
         {
@@ -417,8 +411,6 @@ public class CrouchState : PlayerBase
 
     public override void ExitState(PlayerController.CharacterStateNames p_nextState)
     {
-        m_scale.y *= 2.0f;
-        m_cont.transform.localScale = m_scale;
     }
 }
 
@@ -426,6 +418,7 @@ public class CrouchState : PlayerBase
 public class ChompState : PlayerBase
 {
     private float m_chompTime;
+    private float m_waitTime;
     private PlayerController.CharacterStateNames m_lastState;
     public ChompState(PlayerController p_cont)
     {
@@ -435,6 +428,7 @@ public class ChompState : PlayerBase
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         m_chompTime = m_cont.m_chompDuration;
+        m_waitTime = m_cont.m_chompWaitTime;
         m_lastState = p_prevState;
         Debug.Log("Chomp");
     }
@@ -442,19 +436,25 @@ public class ChompState : PlayerBase
     public override void UpdateState()
     {
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
+
         m_chompTime -= Time.fixedDeltaTime;
+        
         if (m_chompTime > 0)
         {
             Vector2 temp = m_cont.m_rb.velocity;
             temp.x = m_cont.m_chomSpeed*m_cont.m_Direction;
             m_cont.m_rb.velocity = temp;
         }
-        
         if(m_chompTime <= 0)
         {
             m_cont.m_rb.velocity = Vector2.zero;
+            m_waitTime -= Time.fixedDeltaTime;
+        }
+        if(m_waitTime <= 0)
+        {
             m_cont.ChangePlayerState(m_lastState);
         }
+
 
     }
 
@@ -489,6 +489,8 @@ public class ShootState : PlayerBase
         {
             //SHOOTING DIRECTIONAL CODE GOES HERE
         }
+
+
         // NO MOVEMENT;
         m_cont.m_rb.velocity = Vector2.zero;
         if (m_ShootTime <= 0)

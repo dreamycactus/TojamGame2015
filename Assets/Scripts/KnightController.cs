@@ -69,16 +69,18 @@ class KnightController : MonoBehaviour {
 		set { m_Camera = value; }
 	}
 	void OnCollisionEnter2D(Collision2D col) {
-	}
-	void OnCollisionStay2D(Collision2D coll) {
 		if (state == State.INAIR) {
-			foreach (ContactPoint2D tact in coll.contacts) {
-				if (state == State.INAIR && tact.normal == Vector2.up && movedUsed) { 
+			foreach (ContactPoint2D tact in col.contacts) {
+				if (state == State.INAIR && tact.normal == Vector2.up && movedUsed) {
+					m_animator.SetBool("Jumping", false);
 					landed = true;
 					moveTimer = 0;
 				}
 			}
 		}
+	}
+	void OnCollisionStay2D(Collision2D coll) {
+		
 	}
 	void Update() {
 		//keep up with camera
@@ -200,6 +202,7 @@ class KnightController : MonoBehaviour {
 					landed = false;
 					queuedMove = Move.NONE;
 					movedUsed = true;
+					m_animator.SetBool("Jumping", true);
 				}
 				if (body.velocity.magnitude < Constants.KNIGHT_MAX_SPEED && !landed && movedUsed) {
 					body.AddForce(new Vector2(extentX * 15.0f, 0), ForceMode2D.Impulse);

@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour {
     public float m_shootDuration; //how long a shoot animation state is
     public float m_ShootDelayTime; //how long you wait before firing
     public float m_bulletSpeed;//how fast the bullets fly
+    public float m_shootMaxCooldown; // how long before you can shoot again
+    public float m_shootCooldown; //inner cooldown
     public float m_stompPauseDuration; //how long you hang in the air before stomping
     public float m_stompForwardMagnitude; //the force multiplier forward motion on stomping;
     public float m_stompSpeed;//how fast you fall when stomping
@@ -110,9 +112,9 @@ public class PlayerController : MonoBehaviour {
     {
 //////////////////////////////////////////////////////////////////////////
         m_movementMultiplier = 1000.0f; //movement speed multiplier
-        m_maxSpeed = 10.0f; //a speed cap for horizontal movement
+        m_maxSpeed = 20.0f; //a speed cap for horizontal movement
         m_jumpMagnitude = 5000f; ; //jump force multiplier
-        m_jumpSpeed = 15.0f; //how fast you jump up
+        m_jumpSpeed = 17.0f; //how fast you jump up
         m_jumpDuration = 0.3f; //how long you're jumping for
         m_chomSpeed = 10.0f; //how fast you move while chomping
         m_chompDuration = 0.3f; //how long a chomp state is
@@ -120,6 +122,7 @@ public class PlayerController : MonoBehaviour {
         m_shootDuration = 0.4f; //how long a shoot animation state is
         m_ShootDelayTime = 0.2f; //how long you wait before firing
         m_bulletSpeed = 20.0f; //how fast the bullets fly
+        m_shootMaxCooldown = 0.8f; // how long before you can shoot again
         m_stompPauseDuration = 0.1f; //how long you hang in the air before stomping
         m_stompForwardMagnitude = 5.0f; //the force multiplier forward motion on stomping;
         m_stompSpeed = 25.0f; //how fast you fall when stomping
@@ -172,7 +175,9 @@ public class PlayerController : MonoBehaviour {
         //block cooldown countdown
         m_blockCooldown -= Time.fixedDeltaTime;
         m_dashCooldown -= Time.fixedDeltaTime;
+        m_shootCooldown -= Time.fixedDeltaTime;
 
+        
         // State machine shenanigans 
         if (!m_initialised)
             return;
@@ -310,7 +315,7 @@ public class IdlePlayer : PlayerBase
         {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.CrouchState);
         }
-        if (m_cont.m_shootKey)
+        if (m_cont.m_shootKey && m_cont.m_shootCooldown < 0)
         {
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
         }
@@ -368,7 +373,7 @@ public class WalkState : PlayerBase
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.JumpState);
         if (m_cont.m_downKey && m_cont.m_grounded)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.CrouchState);
-        if (m_cont.m_shootKey)
+        if (m_cont.m_shootKey && m_cont.m_shootCooldown < 0)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
         if (m_cont.m_chompKey)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
@@ -434,7 +439,7 @@ public class JumpState : PlayerBase
             //temp.y = m_cont.m_jumpSpeed;
             //m_cont.m_rb.velocity = temp;
         }
-        if (m_cont.m_shootKey)
+        if (m_cont.m_shootKey && m_cont.m_shootCooldown < 0)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
         if (m_cont.m_chompKey)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.StompState);
@@ -473,7 +478,7 @@ public class CrouchState : PlayerBase
         m_cont.m_animator.SetInteger(HashIDs.State, (int)m_cont.m_currentGameStateIndex);
         if (m_cont.m_chompKey)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ChompState);
-        if (m_cont.m_shootKey)
+        if (m_cont.m_shootKey && m_cont.m_shootCooldown < 0)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.ShootState);
         if (m_cont.m_jumpKey && m_cont.m_grounded)
             m_cont.ChangePlayerState(PlayerController.CharacterStateNames.RisingState);
@@ -585,6 +590,7 @@ public class ShootState : PlayerBase
     public override void EnterState(PlayerController.CharacterStateNames p_prevState)
     {
         //Debug.Log("Shooting a fireball");
+        m_cont.m_shootCooldown = m_cont.m_shootMaxCooldown;
         m_ShootTime = m_cont.m_shootDuration;
         m_ShootDelayTime = m_cont.m_ShootDelayTime;
         m_laststate = p_prevState;

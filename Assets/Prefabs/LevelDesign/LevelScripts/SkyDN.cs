@@ -13,8 +13,8 @@ public class SkyDN : MonoBehaviour {
         Vector2 offset = mat.mainTextureOffset;
 
         offset.y -= Time.deltaTime / 20f;
-
-        mat.mainTextureOffset = offset;
+        if (offset.y >0.05)
+            mat.mainTextureOffset = offset;
 
     }
 }

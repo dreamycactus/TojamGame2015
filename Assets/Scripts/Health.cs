@@ -8,6 +8,8 @@ public class Health : MonoBehaviour
     private int m_currentHealth;
     private bool blocking;
 
+	private float endGameTimer = 0;
+
     
 
     // Use this for initialization
@@ -20,7 +22,13 @@ public class Health : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+		if (endGameTimer > 0) {
+			endGameTimer -= Time.deltaTime;
 
+			if (endGameTimer <= 0) {
+				Application.LoadLevel("MainMenu");
+			}
+		}
     }
 
     public bool Blocking
@@ -63,7 +71,12 @@ public class Health : MonoBehaviour
 
             if (m_currentHealth <= 0)
             {
-                gameObject.SendMessage("EnterDeathState");
+				if (gameObject.tag == "Player") {
+					endGameTimer = 5.0f;
+					gameObject.SendMessage("EnterDeathState");
+				} else {
+					gameObject.SendMessage("EnterDeathState");
+				}
             }
         }
 

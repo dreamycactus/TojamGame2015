@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour
 			Destroy(gameObject);
 		}
 
-        if (this.gameObject != null) {
+        else if (this.gameObject != null) {
 			BulletManager.Inst.FreeBullet(this.gameObject);
 		}
 	}
